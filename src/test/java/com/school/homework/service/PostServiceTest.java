@@ -62,7 +62,7 @@ public class PostServiceTest {
     public void whenGetAllPosts_thenReturnPostPage() {
         Pageable pageable = PageRequest.of(0, 5);
         Page<Post> page = new PageImpl<>(Arrays.asList(post));
-        
+
         given(postRepository.findAll(pageable)).willReturn(page);
 
         Page<Post> result = postService.getAllPosts(pageable);

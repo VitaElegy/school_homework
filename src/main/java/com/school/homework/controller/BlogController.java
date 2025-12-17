@@ -85,7 +85,7 @@ public class BlogController {
         postService.createPost(post, user.getId());
         return "redirect:/blog";
     }
-    
+
     @PostMapping("/posts/{id}/delete")
     @PreAuthorize("hasAuthority('POST_DELETE')")
     public String deletePost(@PathVariable Long id, Principal principal) {

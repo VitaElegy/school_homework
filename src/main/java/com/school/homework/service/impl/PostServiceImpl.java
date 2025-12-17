@@ -56,8 +56,8 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Long id, String username) {
         Post post = getPostById(id);
         if (!post.getAuthor().getUsername().equals(username)) {
-            // Check if user has ADMIN role? 
-            // For now, simpler strict check. 
+            // Check if user has ADMIN role?
+            // For now, simpler strict check.
             // In a real app, we'd check authorities.
             throw new AccessDeniedException("You are not authorized to delete this post");
         }
