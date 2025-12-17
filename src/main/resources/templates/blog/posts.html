@@ -32,6 +32,22 @@
             <p class="card-text" th:text="${#strings.abbreviate(post.content, 100)}">Some quick example text...</p>
         </div>
     </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" th:if="${totalPages > 1}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/blog(page=${currentPage - 1}, query=${query})}" tabindex="-1">Previous</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:classappend="${currentPage == i} ? 'active'">
+                <a class="page-link" th:href="@{/blog(page=${i}, query=${query})}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/blog(page=${currentPage + 1}, query=${query})}">Next</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 </body>
 </html>

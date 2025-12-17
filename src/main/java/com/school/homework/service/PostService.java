@@ -1,14 +1,16 @@
 package com.school.homework.service;
 
-import com.school.homework.dto.PostDto;
 import com.school.homework.entity.Post;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 public interface PostService {
-    List<Post> getAllPosts();
-    List<Post> searchPosts(String query);
+    Page<Post> getAllPosts(Pageable pageable);
+    Page<Post> searchPosts(String query, Pageable pageable);
     Post getPostById(Long id);
     Post createPost(Post post, Long userId);
-    void deletePost(Long id);
+    void deletePost(Long id, String username);
 }
 

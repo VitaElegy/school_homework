@@ -11,15 +11,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 public class PostServiceTest {
@@ -55,13 +59,15 @@ public class PostServiceTest {
     }
 
     @Test
-    public void whenGetAllPosts_thenReturnPostList() {
-        given(postRepository.findAll()).willReturn(Arrays.asList(post));
+    public void whenGetAllPosts_thenReturnPostPage() {
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<Post> page = new PageImpl<>(Arrays.asList(post));
+        
+        given(postRepository.findAll(pageable)).willReturn(page);
 
-        List<Post> posts = postService.getAllPosts();
+        Page<Post> result = postService.getAllPosts(pageable);
 
-        assertThat(posts).hasSize(1);
-        assertThat(posts.get(0).getTitle()).isEqualTo(post.getTitle());
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getTitle()).isEqualTo(post.getTitle());
     }
 }
-

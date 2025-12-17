@@ -7,21 +7,21 @@ This project follows the standard **Layered Architecture** pattern common in Spr
 ```mermaid
 graph TD
     Client[Client Browser / API Client] --> ControllerLayer
-    
+
     subgraph "Application Core"
         ControllerLayer[Controller Layer] --> ServiceLayer[Service Layer]
         ServiceLayer --> DataAccessLayer[DAO / Repository Layer]
     end
-    
+
     DataAccessLayer --> Database[(Database / H2 / MySQL)]
-    
+
     %% Details
     ControllerLayer -- "DTOs/Models" --> ServiceLayer
     ServiceLayer -- "Entities" --> DataAccessLayer
 ```
 
 ### Layers Description
-1.  **Presentation Layer (Controller)**: 
+1.  **Presentation Layer (Controller)**:
     *   Handles HTTP requests and responses.
     *   Responsible for input validation and mapping requests to appropriate service methods.
     *   Interacts with the View layer (Thymeleaf) to render HTML.
@@ -51,7 +51,7 @@ The following Class Diagram illustrates the Entity relationships within the syst
 ```mermaid
 classDiagram
     direction BT
-    
+
     class BaseEntity {
         <<MappedSuperclass>>
         +LocalDateTime createdAt
@@ -106,7 +106,7 @@ classDiagram
     User "1" --> "*" Comment : writes
     User "*" --> "*" Role : has
     Role "*" --> "*" Permission : grants
-    
+
     Post "1" *-- "*" Comment : contains
     Post "*" -- "*" Tag : labeled with
 ```

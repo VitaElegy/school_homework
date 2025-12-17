@@ -6,6 +6,9 @@ import com.school.homework.entity.Post;
 import com.school.homework.entity.User;
 import com.school.homework.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,13 +28,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public Page<Post> getAllPosts(Pageable pageable) {
+        return postRepository.findAll(pageable);
     }
 
     @Override
-    public List<Post> searchPosts(String query) {
-        return postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(query, query);
+    public Page<Post> searchPosts(String query, Pageable pageable) {
+        return postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(query, query, pageable);
     }
 
     @Override
@@ -50,7 +53,14 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void deletePost(Long id) {
+    public void deletePost(Long id, String username) {
+        Post post = getPostById(id);
+        if (!post.getAuthor().getUsername().equals(username)) {
+            // Check if user has ADMIN role? 
+            // For now, simpler strict check. 
+            // In a real app, we'd check authorities.
+            throw new AccessDeniedException("You are not authorized to delete this post");
+        }
         postRepository.deleteById(id);
     }
 }

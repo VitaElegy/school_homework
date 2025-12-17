@@ -8,6 +8,10 @@ import com.school.homework.service.PostService;
 import com.school.homework.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,13 +38,25 @@ public class BlogController {
     // --- Post Routes ---
 
     @GetMapping
-    public String listPosts(@RequestParam(required = false) String query, Model model) {
+    public String listPosts(@RequestParam(required = false) String query,
+                            @RequestParam(defaultValue = "0") int page,
+                            @RequestParam(defaultValue = "5") int size,
+                            Model model) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Post> postPage;
+
         if (query != null && !query.trim().isEmpty()) {
-            model.addAttribute("posts", postService.searchPosts(query));
+            postPage = postService.searchPosts(query, pageable);
             model.addAttribute("query", query);
         } else {
-            model.addAttribute("posts", postService.getAllPosts());
+            postPage = postService.getAllPosts(pageable);
         }
+
+        model.addAttribute("posts", postPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", postPage.getTotalPages());
+        model.addAttribute("totalItems", postPage.getTotalElements());
+
         return "blog/posts";
     }
 
@@ -67,6 +83,13 @@ public class BlogController {
         }
         User user = userService.findUserByUsername(principal.getName());
         postService.createPost(post, user.getId());
+        return "redirect:/blog";
+    }
+    
+    @PostMapping("/posts/{id}/delete")
+    @PreAuthorize("hasAuthority('POST_DELETE')")
+    public String deletePost(@PathVariable Long id, Principal principal) {
+        postService.deletePost(id, principal.getName());
         return "redirect:/blog";
     }
 
