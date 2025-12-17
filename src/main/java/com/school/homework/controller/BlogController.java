@@ -3,14 +3,16 @@ package com.school.homework.controller;
 import com.school.homework.entity.Comment;
 import com.school.homework.entity.Post;
 import com.school.homework.entity.User;
-import com.school.homework.service.BlogService;
+import com.school.homework.service.CommentService;
+import com.school.homework.service.PostService;
+import com.school.homework.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.security.Principal;
 
@@ -18,11 +20,15 @@ import java.security.Principal;
 @RequestMapping("/blog")
 public class BlogController {
 
-    private final BlogService blogService;
+    private final PostService postService;
+    private final UserService userService;
+    private final CommentService commentService;
 
     @Autowired
-    public BlogController(BlogService blogService) {
-        this.blogService = blogService;
+    public BlogController(PostService postService, UserService userService, CommentService commentService) {
+        this.postService = postService;
+        this.userService = userService;
+        this.commentService = commentService;
     }
 
     // --- Post Routes ---
@@ -30,17 +36,17 @@ public class BlogController {
     @GetMapping
     public String listPosts(@RequestParam(required = false) String query, Model model) {
         if (query != null && !query.trim().isEmpty()) {
-            model.addAttribute("posts", blogService.searchPosts(query));
+            model.addAttribute("posts", postService.searchPosts(query));
             model.addAttribute("query", query);
         } else {
-            model.addAttribute("posts", blogService.getAllPosts());
+            model.addAttribute("posts", postService.getAllPosts());
         }
         return "blog/posts";
     }
 
     @GetMapping("/posts/{id}")
     public String viewPost(@PathVariable Long id, Model model) {
-        Post post = blogService.getPostById(id);
+        Post post = postService.getPostById(id);
         model.addAttribute("post", post);
         model.addAttribute("newComment", new Comment());
         return "blog/post_detail";
@@ -59,8 +65,8 @@ public class BlogController {
         if (bindingResult.hasErrors()) {
             return "blog/create_post";
         }
-        User user = blogService.findUserByUsername(principal.getName());
-        blogService.createPost(post, user.getId());
+        User user = userService.findUserByUsername(principal.getName());
+        postService.createPost(post, user.getId());
         return "redirect:/blog";
     }
 
@@ -69,8 +75,8 @@ public class BlogController {
     @PostMapping("/posts/{postId}/comments")
     @PreAuthorize("hasAuthority('COMMENT_CREATE')")
     public String addComment(@PathVariable Long postId, @ModelAttribute Comment comment, Principal principal) {
-        User user = blogService.findUserByUsername(principal.getName());
-        blogService.addComment(comment, postId, user.getId());
+        User user = userService.findUserByUsername(principal.getName());
+        commentService.addComment(comment, postId, user.getId());
         return "redirect:/blog/posts/" + postId;
     }
 }

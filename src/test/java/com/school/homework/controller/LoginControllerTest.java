@@ -1,14 +1,17 @@
 package com.school.homework.controller;
 
 import com.school.homework.entity.User;
-import com.school.homework.service.BlogService;
+import com.school.homework.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -20,7 +23,7 @@ public class LoginControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private BlogService blogService;
+    private UserService userService;
 
     @Test
     public void testLoginPage() throws Exception {
@@ -30,47 +33,44 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void testLoginSuccess() throws Exception {
+    public void testRegisterPage() throws Exception {
+        mockMvc.perform(get("/register"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("register"))
+                .andExpect(model().attributeExists("user"));
+    }
+
+    @Test
+    @WithMockUser
+    public void testRegisterSuccess() throws Exception {
         User user = new User();
-        user.setUsername("testuser");
+        user.setUsername("newuser");
         user.setPassword("password");
+        user.setEmail("new@example.com");
 
-        given(blogService.findUserByUsername("testuser")).willReturn(user);
+        given(userService.registerUser(any(User.class))).willReturn(user);
 
-        mockMvc.perform(post("/login")
-                .param("username", "testuser")
-                .param("password", "password"))
+        mockMvc.perform(post("/register")
+                .with(csrf())
+                .param("username", "newuser")
+                .param("password", "password")
+                .param("email", "new@example.com"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/"))
-                .andExpect(request().sessionAttribute("user", user));
+                .andExpect(redirectedUrl("/login?registered"));
     }
 
     @Test
-    public void testLoginFailure_WrongPassword() throws Exception {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword("password");
+    @WithMockUser
+    public void testRegisterFailure_UsernameExists() throws Exception {
+        given(userService.registerUser(any(User.class))).willThrow(new RuntimeException("Username already exists"));
 
-        given(blogService.findUserByUsername("testuser")).willReturn(user);
-
-        mockMvc.perform(post("/login")
-                .param("username", "testuser")
-                .param("password", "wrongpassword"))
+        mockMvc.perform(post("/register")
+                .with(csrf())
+                .param("username", "existing")
+                .param("password", "password")
+                .param("email", "existing@example.com"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("login"))
-                .andExpect(model().attributeExists("error"));
-    }
-
-    @Test
-    public void testLoginFailure_UserNotFound() throws Exception {
-        given(blogService.findUserByUsername("unknown")).willThrow(new RuntimeException("User not found"));
-
-        mockMvc.perform(post("/login")
-                .param("username", "unknown")
-                .param("password", "password"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("login"))
-                .andExpect(model().attributeExists("error"));
+                .andExpect(view().name("register"))
+                .andExpect(model().hasErrors());
     }
 }
-

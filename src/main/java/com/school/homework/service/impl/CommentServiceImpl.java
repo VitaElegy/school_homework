@@ -3,7 +3,6 @@ package com.school.homework.service.impl;
 import com.school.homework.dao.CommentRepository;
 import com.school.homework.dao.PostRepository;
 import com.school.homework.dao.UserRepository;
-import com.school.homework.dto.CommentDto;
 import com.school.homework.entity.Comment;
 import com.school.homework.entity.Post;
 import com.school.homework.entity.User;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -43,22 +41,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> getCommentsByPostId(Long postId) {
-        return commentRepository.findByPostId(postId).stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
-
-    private CommentDto convertToDto(Comment comment) {
-        CommentDto dto = new CommentDto();
-        dto.setId(comment.getId());
-        dto.setContent(comment.getContent());
-        dto.setCreatedAt(comment.getCreatedAt());
-        if (comment.getAuthor() != null) {
-            dto.setAuthorName(comment.getAuthor().getUsername());
-        }
-        return dto;
+    public List<Comment> getCommentsByPostId(Long postId) {
+        return commentRepository.findByPostId(postId);
     }
 }
-
-

@@ -5,10 +5,10 @@ import com.school.homework.entity.Post;
 import java.util.List;
 
 public interface PostService {
-    List<PostDto> getAllPosts();
-    List<PostDto> searchPosts(String query);
-    PostDto getPostById(Long id);
-    Post createPost(Post post, Long userId); // Keeping Entity for input for now
+    List<Post> getAllPosts();
+    List<Post> searchPosts(String query);
+    Post getPostById(Long id);
+    Post createPost(Post post, Long userId);
     void deletePost(Long id);
 }
 
