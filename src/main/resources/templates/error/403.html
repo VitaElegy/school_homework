@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Access Denied</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container mt-5">
+    <div class="alert alert-warning" role="alert">
+        <h4 class="alert-heading">Access Denied!</h4>
+        <p th:text="${errorMessage} ?: 'You do not have permission to view this page.'">Error Message</p>
+        <hr>
+        <p class="mb-0">
+            <a href="/" class="btn btn-secondary">Go Home</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>
+
