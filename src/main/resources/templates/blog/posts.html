@@ -27,20 +27,27 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text bg-white border-right-0"><i class="fas fa-search text-muted"></i></span>
                         </div>
-                        <input class="form-control border-left-0" type="search" name="query" placeholder="Search posts..." aria-label="Search" th:value="${query}">
+                        <input class="form-control border-left-0" type="search" name="query" placeholder="Search posts..." aria-label="Search" th:value="${criteria.query}">
+                        <!-- Hidden inputs to preserve other filters if needed, though for now we only have query and tag maybe -->
+                        <input type="hidden" name="tag" th:if="${criteria.tag}" th:value="${criteria.tag}">
+                        <input type="hidden" name="authorUsername" th:if="${criteria.authorUsername}" th:value="${criteria.authorUsername}">
                     </div>
                 </div>
                 <div class="col-md-2 mt-2 mt-md-0">
                     <button class="btn btn-primary btn-block" type="submit">Search</button>
                 </div>
             </form>
-            <div class="mt-2" th:if="${query}">
-                 <span class="text-muted">Searching for: <strong th:text="${query}"></strong></span>
-                 <a href="/blog" class="text-danger ml-2"><i class="fas fa-times"></i> Clear</a>
+            <div class="mt-2" th:if="${criteria.query}">
+                 <span class="text-muted">Searching for: <strong th:text="${criteria.query}"></strong></span>
+                 <a th:href="@{/blog(tag=${criteria.tag}, authorUsername=${criteria.authorUsername})}" class="text-danger ml-2"><i class="fas fa-times"></i> Clear</a>
             </div>
-             <div class="mt-2" th:if="${tag}">
-                 <span class="text-muted">Filtered by tag: <span class="badge badge-info" th:text="${tag}"></span></span>
-                 <a href="/blog" class="text-danger ml-2"><i class="fas fa-times"></i> Clear</a>
+             <div class="mt-2" th:if="${criteria.tag}">
+                 <span class="text-muted">Filtered by tag: <span class="badge badge-info" th:text="${criteria.tag}"></span></span>
+                 <a th:href="@{/blog(query=${criteria.query}, authorUsername=${criteria.authorUsername})}" class="text-danger ml-2"><i class="fas fa-times"></i> Clear</a>
+            </div>
+             <div class="mt-2" th:if="${criteria.authorUsername}">
+                 <span class="text-muted">Filtered by author: <span class="badge badge-secondary" th:text="${criteria.authorUsername}"></span></span>
+                 <a th:href="@{/blog(query=${criteria.query}, tag=${criteria.tag})}" class="text-danger ml-2"><i class="fas fa-times"></i> Clear</a>
             </div>
         </div>
     </div>
@@ -90,16 +97,16 @@
     <nav aria-label="Page navigation" th:if="${totalPages > 1}" class="mt-4">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <a class="page-link shadow-sm border-0" th:href="@{/blog(page=${currentPage - 1}, query=${query}, tag=${tag})}" tabindex="-1">
+                <a class="page-link shadow-sm border-0" th:href="@{/blog(page=${currentPage - 1}, query=${criteria.query}, tag=${criteria.tag}, authorUsername=${criteria.authorUsername})}" tabindex="-1">
                     <i class="fas fa-chevron-left"></i>
                 </a>
             </li>
             <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                 th:classappend="${currentPage == i} ? 'active'">
-                <a class="page-link shadow-sm border-0 mx-1 rounded-circle" th:href="@{/blog(page=${i}, query=${query}, tag=${tag})}" th:text="${i + 1}">1</a>
+                <a class="page-link shadow-sm border-0 mx-1 rounded-circle" th:href="@{/blog(page=${i}, query=${criteria.query}, tag=${criteria.tag}, authorUsername=${criteria.authorUsername})}" th:text="${i + 1}">1</a>
             </li>
             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link shadow-sm border-0" th:href="@{/blog(page=${currentPage + 1}, query=${query}, tag=${tag})}">
+                <a class="page-link shadow-sm border-0" th:href="@{/blog(page=${currentPage + 1}, query=${criteria.query}, tag=${criteria.tag}, authorUsername=${criteria.authorUsername})}">
                     <i class="fas fa-chevron-right"></i>
                 </a>
             </li>

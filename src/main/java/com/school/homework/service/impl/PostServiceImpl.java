@@ -4,7 +4,9 @@ import com.school.homework.constant.AppConstants;
 import com.school.homework.dao.PostRepository;
 import com.school.homework.dao.TagRepository;
 import com.school.homework.dao.UserRepository;
+import com.school.homework.dao.specification.PostSpecification;
 import com.school.homework.dto.PostDto;
+import com.school.homework.dto.PostSearchCriteria;
 import com.school.homework.entity.Post;
 import com.school.homework.entity.Tag;
 import com.school.homework.entity.User;
@@ -42,15 +44,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<Post> searchPosts(String query, Pageable pageable) {
-        return postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(query, query, pageable);
+    public Page<Post> searchPosts(PostSearchCriteria criteria, Pageable pageable) {
+        return postRepository.findAll(PostSpecification.withCriteria(criteria), pageable);
     }
 
-    @Override
-    public Page<Post> getPostsByTag(String tagName, Pageable pageable) {
-        return postRepository.findByTags_Name(tagName, pageable);
-    }
-
+    // Deprecated methods removed or redirected if needed, but for now searchPosts replaces them.
+    
     @Override
     public Post getPostById(Long id) {
         return postRepository.findById(id)

@@ -2,6 +2,7 @@ package com.school.homework.controller;
 
 import com.school.homework.dto.CommentDto;
 import com.school.homework.dto.PostDto;
+import com.school.homework.dto.PostSearchCriteria;
 import com.school.homework.entity.Post;
 import com.school.homework.entity.Tag;
 import com.school.homework.service.CommentService;
@@ -40,28 +41,19 @@ public class BlogController {
     // --- Post Routes ---
 
     @GetMapping
-    public String listPosts(@RequestParam(required = false) String query,
-                            @RequestParam(required = false) String tag,
+    public String listPosts(@ModelAttribute PostSearchCriteria criteria,
                             @RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "5") int size,
                             Model model) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Post> postPage;
-
-        if (tag != null && !tag.trim().isEmpty()) {
-             postPage = postService.getPostsByTag(tag, pageable);
-             model.addAttribute("tag", tag);
-        } else if (query != null && !query.trim().isEmpty()) {
-            postPage = postService.searchPosts(query, pageable);
-            model.addAttribute("query", query);
-        } else {
-            postPage = postService.getAllPosts(pageable);
-        }
+        
+        Page<Post> postPage = postService.searchPosts(criteria, pageable);
 
         model.addAttribute("posts", postPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", postPage.getTotalPages());
         model.addAttribute("totalItems", postPage.getTotalElements());
+        model.addAttribute("criteria", criteria); // Add criteria to model to refill form
 
         return "blog/posts";
     }
