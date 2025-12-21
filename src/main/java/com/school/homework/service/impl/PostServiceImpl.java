@@ -14,7 +14,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -40,6 +43,11 @@ public class PostServiceImpl implements PostService {
     public Page<Post> searchPosts(String query, Pageable pageable) {
         return postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(query, query, pageable);
     }
+    
+    @Override
+    public Page<Post> getPostsByTag(String tagName, Pageable pageable) {
+        return postRepository.findByTags_Name(tagName, pageable);
+    }
 
     @Override
     public Post getPostById(Long id) {
@@ -52,7 +60,50 @@ public class PostServiceImpl implements PostService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
         post.setAuthor(user);
+        
+        processTags(post, tags);
+        
+        return postRepository.save(post);
+    }
 
+    @Override
+    public Post updatePost(Long id, Post postUpdates, String tags, String username) {
+        Post existingPost = getPostById(id);
+        
+        // Ownership check
+        if (!existingPost.getAuthor().getUsername().equals(username)) {
+            // Check for admin role if we had easy access, or rely on controller security
+             throw new AccessDeniedException("You are not authorized to edit this post");
+        }
+        
+        existingPost.setTitle(postUpdates.getTitle());
+        existingPost.setContent(postUpdates.getContent());
+        existingPost.setUpdatedAt(LocalDateTime.now());
+        
+        // Clear existing tags and re-add to sync
+        existingPost.getTags().clear();
+        processTags(existingPost, tags);
+        
+        return postRepository.save(existingPost);
+    }
+
+    @Override
+    public void deletePost(Long id, String username) {
+        Post post = getPostById(id);
+        boolean isOwner = post.getAuthor().getUsername().equals(username);
+        
+        if (!isOwner) {
+             User user = userRepository.findByUsername(username).orElseThrow();
+             boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_ADMIN"));
+             if (!isAdmin) {
+                 throw new AccessDeniedException("You are not authorized to delete this post");
+             }
+        }
+        
+        postRepository.deleteById(id);
+    }
+    
+    private void processTags(Post post, String tags) {
         if (tags != null && !tags.trim().isEmpty()) {
             String[] tagNames = tags.split(",");
             for (String tagName : tagNames) {
@@ -64,42 +115,5 @@ public class PostServiceImpl implements PostService {
                 }
             }
         }
-
-        return postRepository.save(post);
-    }
-
-    @Override
-    public void deletePost(Long id, String username) {
-        Post post = getPostById(id);
-        // Allow admin or owner to delete
-        // Re-fetching user to check roles is one way, or trusting SecurityContext authorities in Controller
-        // Here we just check ownership for simplicity as per previous code, but could be enhanced.
-        // Actually the controller has @PreAuthorize("hasAuthority('POST_DELETE')"), so the user calling this
-        // definitely has permission to invoke the endpoint.
-        // However, standard logic usually implies 'POST_DELETE' allows deleting ANY post (admin)
-        // OR one's own post.
-        // The previous code had strict owner check OR comment about ADMIN.
-        // Let's keep it simple: if not owner, and maybe check role?
-        // Since we don't have easy access to authorities here without SecurityContextHolder,
-        // we'll assume the Controller/Security layer handles "CAN invoke".
-        // But business logic "CAN delete THIS specific post" is stricter.
-
-        boolean isOwner = post.getAuthor().getUsername().equals(username);
-        // Ideally we check if user is Admin.
-        // For now, let's stick to the previous logic but maybe relax it if we can confirm admin?
-        // Let's trust the previous implementation's intent but maybe the user wants full features.
-        // I'll leave the ownership check for now to be safe, as I don't want to break existing tests if any.
-
-        if (!isOwner) {
-             // For Admin override, we'd need to check the current user's roles.
-             // We can fetch the user by username.
-             User user = userRepository.findByUsername(username).orElseThrow();
-             boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_ADMIN"));
-             if (!isAdmin) {
-                 throw new AccessDeniedException("You are not authorized to delete this post");
-             }
-        }
-
-        postRepository.deleteById(id);
     }
 }

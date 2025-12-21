@@ -11,6 +11,8 @@ public interface PostService {
     Page<Post> searchPosts(String query, Pageable pageable);
     Post getPostById(Long id);
     Post createPost(Post post, Long userId, String tags);
+    Post updatePost(Long id, Post postDto, String tags, String username);
+    Page<Post> getPostsByTag(String tagName, Pageable pageable);
     void deletePost(Long id, String username);
 }
 

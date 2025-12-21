@@ -12,12 +12,18 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <a href="/blog" class="btn btn-secondary">&larr; Back to Posts</a>
 
-        <!-- Delete Button (Only for Author) -->
-        <form th:if="${#authentication.name == post.author.username}"
-              th:action="@{/blog/posts/{id}/delete(id=${post.id})}" method="post"
-              onsubmit="return confirm('Are you sure you want to delete this post?');">
-            <button type="submit" class="btn btn-danger">Delete Post</button>
-        </form>
+        <div class="btn-group" role="group">
+             <!-- Edit Button (Only for Author) -->
+             <a th:if="${#authentication.name == post.author.username}"
+                th:href="@{/blog/posts/{id}/edit(id=${post.id})}" class="btn btn-primary mr-2">Edit Post</a>
+                
+            <!-- Delete Button (Only for Author) -->
+            <form th:if="${#authentication.name == post.author.username}"
+                  th:action="@{/blog/posts/{id}/delete(id=${post.id})}" method="post"
+                  onsubmit="return confirm('Are you sure you want to delete this post?');">
+                <button type="submit" class="btn btn-danger">Delete Post</button>
+            </form>
+        </div>
     </div>
 
     <div class="card mb-5">
@@ -25,7 +31,7 @@
             <h1 class="card-title" th:text="${post.title}">Title</h1>
             <h6 class="card-subtitle mb-3 text-muted" th:text="'By ' + ${post.author.username} + ' on ' + ${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">Meta</h6>
             <div class="mb-3">
-                <span th:each="tag : ${post.tags}" class="badge badge-info mr-1" th:text="${tag.name}">Tag</span>
+                <a th:each="tag : ${post.tags}" th:href="@{/blog(tag=${tag.name})}" class="badge badge-info mr-1" th:text="${tag.name}">Tag</a>
             </div>
             <p class="card-text" th:text="${post.content}" style="white-space: pre-wrap;">Content</p>
         </div>

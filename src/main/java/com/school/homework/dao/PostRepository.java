@@ -12,5 +12,5 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByAuthorId(Long userId);
     Page<Post> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(String title, String content, Pageable pageable);
+    Page<Post> findByTags_Name(String tagName, Pageable pageable);
 }
-

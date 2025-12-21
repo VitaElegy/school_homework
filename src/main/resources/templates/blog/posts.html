@@ -30,7 +30,7 @@
             </h5>
             <h6 class="card-subtitle mb-2 text-muted" th:text="'By ' + ${post.author.username} + ' on ' + ${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">Card subtitle</h6>
             <div class="mb-2">
-                <span th:each="tag : ${post.tags}" class="badge badge-secondary mr-1" th:text="${tag.name}">Tag</span>
+                <a th:each="tag : ${post.tags}" th:href="@{/blog(tag=${tag.name})}" class="badge badge-secondary mr-1" th:text="${tag.name}">Tag</a>
             </div>
             <p class="card-text" th:text="${#strings.abbreviate(post.content, 100)}">Some quick example text...</p>
         </div>
@@ -40,14 +40,14 @@
     <nav aria-label="Page navigation" th:if="${totalPages > 1}">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/blog(page=${currentPage - 1}, query=${query})}" tabindex="-1">Previous</a>
+                <a class="page-link" th:href="@{/blog(page=${currentPage - 1}, query=${query}, tag=${tag})}" tabindex="-1">Previous</a>
             </li>
             <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                 th:classappend="${currentPage == i} ? 'active'">
-                <a class="page-link" th:href="@{/blog(page=${i}, query=${query})}" th:text="${i + 1}">1</a>
+                <a class="page-link" th:href="@{/blog(page=${i}, query=${query}, tag=${tag})}" th:text="${i + 1}">1</a>
             </li>
             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/blog(page=${currentPage + 1}, query=${query})}">Next</a>
+                <a class="page-link" th:href="@{/blog(page=${currentPage + 1}, query=${query}, tag=${tag})}">Next</a>
             </li>
         </ul>
     </nav>
