@@ -45,9 +45,18 @@ public class UserServiceTest {
 
     @BeforeEach
     public void setup() {
-        user = new User(1L, "testuser", "password", "test@example.com", LocalDateTime.now(), null, new HashSet<>());
-        role = new Role(1L, "ROLE_USER", new HashSet<>());
-
+        user = new User();
+        user.setId(1L);
+        user.setUsername("testuser");
+        user.setPassword("password");
+        user.setEmail("test@example.com");
+        user.setRoles(new HashSet<>());
+        
+        role = new Role();
+        role.setId(1L);
+        role.setName("ROLE_USER");
+        role.setPermissions(new HashSet<>());
+        
         registerDto = new RegisterDto();
         registerDto.setUsername("testuser");
         registerDto.setPassword("password");

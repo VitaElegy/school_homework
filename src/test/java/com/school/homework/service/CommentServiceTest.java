@@ -43,8 +43,18 @@ public class CommentServiceTest {
 
     @BeforeEach
     public void setup() {
-        user = new User(1L, "testuser", "password", "test@example.com", LocalDateTime.now(), null, new HashSet<>());
-        post = new Post(1L, "Test Title", "Test Content", com.school.homework.enums.PostStatus.DRAFT, user, null, new HashSet<>());
+        user = new User();
+        user.setId(1L);
+        user.setUsername("testuser");
+        user.setPassword("password");
+        user.setEmail("test@example.com");
+        
+        post = new Post();
+        post.setId(1L);
+        post.setTitle("Test Title");
+        post.setContent("Test Content");
+        post.setStatus(com.school.homework.enums.PostStatus.DRAFT);
+        post.setAuthor(user);
     }
 
     @Test
