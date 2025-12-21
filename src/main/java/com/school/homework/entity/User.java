@@ -37,6 +37,9 @@ public class User extends BaseEntity {
     @NotBlank(message = "Email cannot be empty")
     private String email;
 
+    @Column(name = "avatar")
+    private String avatar;
+
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Post> posts;
 

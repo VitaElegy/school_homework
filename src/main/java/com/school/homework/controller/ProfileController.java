@@ -30,6 +30,7 @@ public class ProfileController {
         UserProfileDto userProfileDto = new UserProfileDto();
         userProfileDto.setUsername(user.getUsername());
         userProfileDto.setEmail(user.getEmail());
+        userProfileDto.setCurrentAvatar(user.getAvatar());
         
         model.addAttribute("profile", userProfileDto);
         return "profile";
@@ -38,6 +39,9 @@ public class ProfileController {
     @PostMapping("/profile")
     public String updateProfile(@Valid @ModelAttribute("profile") UserProfileDto userProfileDto, BindingResult bindingResult, Principal principal, Model model) {
         if (bindingResult.hasErrors()) {
+            // Need to reload current avatar as file input is cleared
+            User user = userService.findUserByUsername(principal.getName());
+            userProfileDto.setCurrentAvatar(user.getAvatar());
             return "profile";
         }
 
@@ -46,20 +50,25 @@ public class ProfileController {
             model.addAttribute("successMessage", "Profile updated successfully!");
         } catch (IllegalArgumentException | com.school.homework.exception.DuplicateResourceException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            return "profile"; // Return to profile page with error
+            // Need to reload current avatar
+            User user = userService.findUserByUsername(principal.getName());
+            userProfileDto.setCurrentAvatar(user.getAvatar());
+            return "profile"; 
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "An unexpected error occurred.");
+            model.addAttribute("errorMessage", "An unexpected error occurred: " + e.getMessage());
+            // Need to reload current avatar
+            User user = userService.findUserByUsername(principal.getName());
+            userProfileDto.setCurrentAvatar(user.getAvatar());
             return "profile";
         }
         
-        // Refresh DTO with potentially updated data (though username is same)
-        // Ideally redirect to get pattern to avoid resubmit, but passing success message via flash attributes requires RedirectAttributes
-        // For simplicity with this current setup, we just return the view with the message.
-        // But to be robust, let's keep the user inputs if there was an error (already done by @ModelAttribute), 
-        // if success, we can clear password fields.
-        
         userProfileDto.setNewPassword("");
         userProfileDto.setConfirmNewPassword("");
+        
+        // Reload avatar after success
+        User updatedUser = userService.findUserByUsername(principal.getName());
+        userProfileDto.setCurrentAvatar(updatedUser.getAvatar());
+        
         return "profile";
     }
 }

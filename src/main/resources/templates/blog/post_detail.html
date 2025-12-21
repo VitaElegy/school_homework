@@ -23,7 +23,11 @@
             <h1 class="card-title display-4 font-weight-bold mb-3" th:text="${post.title}">Title</h1>
 
             <div class="d-flex align-items-center mb-4 text-muted post-meta">
-                <span class="mr-3"><i class="fas fa-user-circle mr-1"></i> <span th:text="${post.author.username}">Author</span></span>
+                <span class="mr-3 d-flex align-items-center">
+                    <img th:if="${post.author.avatar != null}" th:src="@{'/uploads/avatars/' + ${post.author.avatar}}" class="rounded-circle mr-2" width="30" height="30" style="object-fit: cover;">
+                    <i th:if="${post.author.avatar == null}" class="fas fa-user-circle mr-2"></i>
+                    <span th:text="${post.author.username}">Author</span>
+                </span>
                 <span class="mr-3"><i class="far fa-calendar-alt mr-1"></i> <span th:text="${#temporals.format(post.createdAt, 'MMM d, yyyy HH:mm')}">Date</span></span>
                 <span><i class="far fa-eye mr-1"></i> <span th:text="${post.viewCount}">0</span> Views</span>
             </div>
@@ -69,8 +73,9 @@
             <div class="card comment-card shadow-sm mb-3 border-0" th:each="comment : ${post.comments}">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
-                        <h6 class="font-weight-bold mb-0">
-                            <i class="fas fa-user-circle mr-1 text-muted"></i>
+                        <h6 class="font-weight-bold mb-0 d-flex align-items-center">
+                            <img th:if="${comment.author.avatar != null}" th:src="@{'/uploads/avatars/' + ${comment.author.avatar}}" class="rounded-circle mr-2" width="24" height="24" style="object-fit: cover;">
+                            <i th:if="${comment.author.avatar == null}" class="fas fa-user-circle mr-2 text-muted"></i> 
                             <span th:text="${comment.author.username}">User</span>
                         </h6>
                         <small class="text-muted" th:text="${#temporals.format(comment.createdAt, 'MMM d, yyyy HH:mm')}">Date</small>

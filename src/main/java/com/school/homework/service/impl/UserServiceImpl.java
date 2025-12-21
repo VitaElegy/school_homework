@@ -7,6 +7,7 @@ import com.school.homework.dto.UserDto;
 import com.school.homework.dto.UserProfileDto;
 import com.school.homework.entity.Role;
 import com.school.homework.entity.User;
+import com.school.homework.service.FileStorageService;
 import com.school.homework.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,12 +22,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FileStorageService fileStorageService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.fileStorageService = fileStorageService;
     }
 
     @Override
@@ -80,6 +83,16 @@ public class UserServiceImpl implements UserService {
                 throw new IllegalArgumentException("Passwords do not match");
             }
             user.setPassword(passwordEncoder.encode(userProfileDto.getNewPassword()));
+        }
+        
+        // Update Avatar
+        if (userProfileDto.getAvatar() != null && !userProfileDto.getAvatar().isEmpty()) {
+            // Delete old avatar if exists
+            if (user.getAvatar() != null) {
+                fileStorageService.deleteFile(user.getAvatar());
+            }
+            String fileName = fileStorageService.saveFile(userProfileDto.getAvatar());
+            user.setAvatar(fileName);
         }
         
         userRepository.save(user);

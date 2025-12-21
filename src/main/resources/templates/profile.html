@@ -28,8 +28,22 @@
                         </button>
                     </div>
 
-                    <form th:action="@{/profile}" th:object="${profile}" method="post">
+                    <form th:action="@{/profile}" th:object="${profile}" method="post" enctype="multipart/form-data">
                         
+                        <!-- Avatar Section -->
+                        <div class="text-center mb-4">
+                            <img th:if="${profile.currentAvatar == null}" src="https://ui-avatars.com/api/?name=User&background=random" class="rounded-circle shadow-sm" width="120" height="120" alt="Avatar">
+                            <img th:if="${profile.currentAvatar != null}" th:src="@{'/uploads/avatars/' + ${profile.currentAvatar}}" class="rounded-circle shadow-sm" width="120" height="120" alt="Avatar" style="object-fit: cover;">
+                            
+                            <div class="mt-3">
+                                <label for="avatar" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-camera mr-1"></i> Change Avatar
+                                </label>
+                                <input type="file" id="avatar" th:field="*{avatar}" class="d-none" accept="image/*" onchange="document.getElementById('avatar-name').textContent = this.files[0].name">
+                                <small id="avatar-name" class="d-block text-muted mt-1"></small>
+                            </div>
+                        </div>
+
                         <!-- Username (Read-only) -->
                         <div class="form-group">
                             <label class="font-weight-bold">Username</label>
