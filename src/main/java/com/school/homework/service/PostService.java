@@ -12,6 +12,7 @@ public interface PostService {
     Post getPostById(Long id);
     Post createPost(Post post, Long userId, String tags);
     Post updatePost(Long id, Post postDto, String tags, String username);
+    void incrementViewCount(Long id);
     Page<Post> getPostsByTag(String tagName, Pageable pageable);
     void deletePost(Long id, String username);
 }

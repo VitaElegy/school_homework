@@ -39,6 +39,9 @@ public class Post extends BaseEntity {
     @NotNull(message = "Status cannot be null")
     private PostStatus status = PostStatus.DRAFT;
 
+    @Column(columnDefinition = "integer default 0")
+    private int viewCount = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User author;

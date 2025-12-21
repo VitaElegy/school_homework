@@ -68,6 +68,7 @@ public class BlogController {
 
     @GetMapping("/posts/{id}")
     public String viewPost(@PathVariable Long id, Model model) {
+        postService.incrementViewCount(id);
         Post post = postService.getPostById(id);
         model.addAttribute("post", post);
         model.addAttribute("newComment", new Comment());
@@ -91,19 +92,19 @@ public class BlogController {
         postService.createPost(post, user.getId(), tagString);
         return "redirect:/blog";
     }
-    
+
     @GetMapping("/posts/{id}/edit")
     @PreAuthorize("hasAuthority('POST_UPDATE')")
     public String editPostForm(@PathVariable Long id, Model model, Principal principal) {
         Post post = postService.getPostById(id);
-        
+
         // Basic check before showing form (double check in service on save)
         if (!post.getAuthor().getUsername().equals(principal.getName())) {
              return "error/403";
         }
-        
+
         String tagString = post.getTags().stream().map(Tag::getName).collect(Collectors.joining(", "));
-        
+
         model.addAttribute("post", post);
         model.addAttribute("tagString", tagString);
         return "blog/edit_post";

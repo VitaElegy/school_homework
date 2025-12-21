@@ -64,13 +64,13 @@ public class PostServiceTest {
         assertThat(createdPost.getTitle()).isEqualTo("Test Title");
         assertThat(createdPost.getAuthor()).isEqualTo(user);
     }
-    
+
     @Test
     public void whenCreatePostWithTags_thenReturnPostWithTags() {
         String tagString = "Java, Spring";
         given(userRepository.findById(1L)).willReturn(Optional.of(user));
         given(postRepository.save(post)).willReturn(post);
-        
+
         // Mocking for "Java" (new tag)
         given(tagRepository.findByName("Java")).willReturn(Optional.empty());
         given(tagRepository.save(any(Tag.class))).willAnswer(invocation -> {
@@ -78,7 +78,7 @@ public class PostServiceTest {
             t.setId(10L); // simulate saving
             return t;
         });
-        
+
         // Mocking for "Spring" (existing tag)
         Tag springTag = new Tag("Spring");
         springTag.setId(11L);
@@ -103,7 +103,7 @@ public class PostServiceTest {
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getTitle()).isEqualTo(post.getTitle());
     }
-    
+
     @Test
     public void whenUpdatePost_thenUpdateTitleAndTags() {
         Long postId = 1L;
@@ -111,10 +111,10 @@ public class PostServiceTest {
         updates.setTitle("Updated Title");
         updates.setContent("Updated Content");
         String tags = "NewTag";
-        
+
         given(postRepository.findById(postId)).willReturn(Optional.of(post));
         given(postRepository.save(any(Post.class))).willAnswer(i -> i.getArgument(0));
-        
+
         // Mock tag
         given(tagRepository.findByName("NewTag")).willReturn(Optional.empty());
         given(tagRepository.save(any(Tag.class))).willAnswer(i -> {
@@ -122,9 +122,9 @@ public class PostServiceTest {
             t.setId(20L);
             return t;
         });
-        
+
         Post updatedPost = postService.updatePost(postId, updates, tags, "testuser");
-        
+
         assertThat(updatedPost.getTitle()).isEqualTo("Updated Title");
         assertThat(updatedPost.getContent()).isEqualTo("Updated Content");
         assertThat(updatedPost.getTags()).hasSize(1);

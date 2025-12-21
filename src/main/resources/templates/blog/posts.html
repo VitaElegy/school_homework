@@ -28,7 +28,7 @@
             <h5 class="card-title">
                 <a th:href="@{/blog/posts/{id}(id=${post.id})}" th:text="${post.title}">Post Title</a>
             </h5>
-            <h6 class="card-subtitle mb-2 text-muted" th:text="'By ' + ${post.author.username} + ' on ' + ${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">Card subtitle</h6>
+            <h6 class="card-subtitle mb-2 text-muted" th:text="'By ' + ${post.author.username} + ' on ' + ${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')} + ' | Views: ' + ${post.viewCount}">Card subtitle</h6>
             <div class="mb-2">
                 <a th:each="tag : ${post.tags}" th:href="@{/blog(tag=${tag.name})}" class="badge badge-secondary mr-1" th:text="${tag.name}">Tag</a>
             </div>

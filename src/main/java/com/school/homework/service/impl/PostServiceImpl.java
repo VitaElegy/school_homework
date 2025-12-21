@@ -43,7 +43,7 @@ public class PostServiceImpl implements PostService {
     public Page<Post> searchPosts(String query, Pageable pageable) {
         return postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(query, query, pageable);
     }
-    
+
     @Override
     public Page<Post> getPostsByTag(String tagName, Pageable pageable) {
         return postRepository.findByTags_Name(tagName, pageable);
@@ -60,30 +60,30 @@ public class PostServiceImpl implements PostService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
         post.setAuthor(user);
-        
+
         processTags(post, tags);
-        
+
         return postRepository.save(post);
     }
 
     @Override
     public Post updatePost(Long id, Post postUpdates, String tags, String username) {
         Post existingPost = getPostById(id);
-        
+
         // Ownership check
         if (!existingPost.getAuthor().getUsername().equals(username)) {
             // Check for admin role if we had easy access, or rely on controller security
              throw new AccessDeniedException("You are not authorized to edit this post");
         }
-        
+
         existingPost.setTitle(postUpdates.getTitle());
         existingPost.setContent(postUpdates.getContent());
         existingPost.setUpdatedAt(LocalDateTime.now());
-        
+
         // Clear existing tags and re-add to sync
         existingPost.getTags().clear();
         processTags(existingPost, tags);
-        
+
         return postRepository.save(existingPost);
     }
 
@@ -91,7 +91,7 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Long id, String username) {
         Post post = getPostById(id);
         boolean isOwner = post.getAuthor().getUsername().equals(username);
-        
+
         if (!isOwner) {
              User user = userRepository.findByUsername(username).orElseThrow();
              boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_ADMIN"));
@@ -99,8 +99,15 @@ public class PostServiceImpl implements PostService {
                  throw new AccessDeniedException("You are not authorized to delete this post");
              }
         }
-        
+
         postRepository.deleteById(id);
+    }
+
+    @Override
+    public void incrementViewCount(Long id) {
+        Post post = getPostById(id);
+        post.setViewCount(post.getViewCount() + 1);
+        postRepository.save(post);
     }
     
     private void processTags(Post post, String tags) {
