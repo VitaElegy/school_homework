@@ -20,9 +20,9 @@ This is a Spring Boot application that manages Students and a Blog system.
     - `service`: Business logic interfaces and implementations.
     - `dao`: Data Access Objects (JPA Repositories).
     - `entity`: JPA Entities (`User`, `Post`, `Comment`).
-    - `config`: Web and Security configuration.
+    - `config`: Web, Security, and OpenAPI configuration.
     - `exception`: Global exception handling.
-    - `dto`: Data Transfer Objects.
+    - `dto`: Data Transfer Objects (Validated).
 - `src/main/resources/templates`
     - `blog`: Blog pages.
     - `fragments`: Shared UI components (Header).
@@ -32,6 +32,8 @@ This is a Spring Boot application that manages Students and a Blog system.
 
 This project has been refined to meet professional standards:
 
+-   **API Documentation**: Integrated OpenAPI (Swagger UI) for comprehensive API endpoint documentation.
+-   **Robust Validation**: Implemented strict validation on both Entities and DTOs using Jakarta Validation constraints (`@NotBlank`, `@Size`, etc.).
 -   **Optimized Data Access**: Tag processing now uses batch fetching to prevent N+1 Select issues.
 -   **Security**: Internal error details are hidden from users; proper Exception Handling mechanism is in place.
 -   **Clean Architecture**: Controllers are decoupled from Repositories and `UserService`, delegating all business logic to dedicated Services.
@@ -46,9 +48,10 @@ This project has been refined to meet professional standards:
     mvn spring-boot:run
     ```
 3.  **Access the Application**:
-    - Home: http://localhost:8080/
-    - Login: http://localhost:8080/login (Create an account first via Register)
-    - H2 Console: http://localhost:8080/h2-console (JDBC URL: `jdbc:h2:mem:testdb`)
+    - **Home**: http://localhost:8080/
+    - **API Documentation (Swagger UI)**: http://localhost:8080/swagger-ui/index.html
+    - **Login**: http://localhost:8080/login (Create an account first via Register)
+    - **H2 Console**: http://localhost:8080/h2-console (JDBC URL: `jdbc:h2:mem:testdb`)
 
 ## Tests
 
