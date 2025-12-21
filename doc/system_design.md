@@ -133,6 +133,7 @@ classDiagram
 *   **Tagging System**: 
     *   Users can add tags (comma-separated) when creating a post.
     *   Tags are automatically de-duplicated and reused if they already exist in the database.
+    *   **Optimization**: Uses batch processing to minimize database queries (prevents N+1 problem).
 *   **Delete Post**: 
     *   Post owners can delete their own posts.
     *   Admin users can delete any post.

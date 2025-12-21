@@ -50,10 +50,10 @@ public class CommentServiceTest {
         Comment comment = new Comment(1L, "Nice post!", LocalDateTime.now(), null, null);
 
         given(postRepository.findById(1L)).willReturn(Optional.of(post));
-        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(userRepository.findByUsername("testuser")).willReturn(Optional.of(user));
         given(commentRepository.save(comment)).willReturn(comment);
 
-        Comment addedComment = commentService.addComment(comment, 1L, 1L);
+        Comment addedComment = commentService.addComment(comment, 1L, "testuser");
 
         assertThat(addedComment).isNotNull();
         assertThat(addedComment.getPost()).isEqualTo(post);

@@ -10,7 +10,7 @@ public interface PostService {
     Page<Post> getAllPosts(Pageable pageable);
     Page<Post> searchPosts(String query, Pageable pageable);
     Post getPostById(Long id);
-    Post createPost(Post post, Long userId, String tags);
+    Post createPost(Post post, String username, String tags);
     Post updatePost(Long id, Post postDto, String tags, String username);
     void incrementViewCount(Long id);
     Page<Post> getPostsByTag(String tagName, Pageable pageable);

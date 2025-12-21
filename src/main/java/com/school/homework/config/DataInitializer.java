@@ -51,6 +51,17 @@ public class DataInitializer {
                 userRepository.save(admin);
                 System.out.println("Admin user created: admin / admin123");
             }
+
+            // 4. Create Standard User if not exists
+            if (userRepository.findByUsername("user").isEmpty()) {
+                User user = new User();
+                user.setUsername("user");
+                user.setPassword(passwordEncoder.encode("password"));
+                user.setEmail("user@school.com");
+                user.setRoles(new HashSet<>(Arrays.asList(userRole)));
+                userRepository.save(user);
+                System.out.println("Standard user created: user / password");
+            }
         };
     }
 

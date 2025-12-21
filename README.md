@@ -16,17 +16,26 @@ This is a Spring Boot application that manages Students and a Blog system.
 ## Project Structure
 
 - `src/main/java/com/school/homework`
-    - `controller`: Web controllers (`StudentController`, `BlogController`, `LoginController`).
+    - `controller`: Web controllers (`BlogController`, `LoginController`).
     - `service`: Business logic interfaces and implementations.
     - `dao`: Data Access Objects (JPA Repositories).
-    - `entity`: JPA Entities (`User`, `Student`, `Post`, `Comment`).
-    - `config`: Web configuration (Interceptors).
+    - `entity`: JPA Entities (`User`, `Post`, `Comment`).
+    - `config`: Web and Security configuration.
     - `exception`: Global exception handling.
+    - `dto`: Data Transfer Objects.
 - `src/main/resources/templates`
-    - `students`: Student management pages.
     - `blog`: Blog pages.
     - `fragments`: Shared UI components (Header).
     - `error`: Error pages.
+
+## Code Quality Improvements
+
+This project has been refined to meet professional standards:
+
+-   **Optimized Data Access**: Tag processing now uses batch fetching to prevent N+1 Select issues.
+-   **Security**: Internal error details are hidden from users; proper Exception Handling mechanism is in place.
+-   **Clean Architecture**: Controllers are decoupled from Repositories and `UserService`, delegating all business logic to dedicated Services.
+-   **Robustness**: Standardized `ResourceNotFoundException` usage across the application.
 
 ## How to Run
 

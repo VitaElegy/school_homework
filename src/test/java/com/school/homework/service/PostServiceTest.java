@@ -19,9 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -55,10 +53,10 @@ public class PostServiceTest {
 
     @Test
     public void whenCreatePost_thenReturnPost() {
-        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(userRepository.findByUsername("testuser")).willReturn(Optional.of(user));
         given(postRepository.save(post)).willReturn(post);
 
-        Post createdPost = postService.createPost(post, 1L, null);
+        Post createdPost = postService.createPost(post, "testuser", null);
 
         assertThat(createdPost).isNotNull();
         assertThat(createdPost.getTitle()).isEqualTo("Test Title");
@@ -68,23 +66,24 @@ public class PostServiceTest {
     @Test
     public void whenCreatePostWithTags_thenReturnPostWithTags() {
         String tagString = "Java, Spring";
-        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(userRepository.findByUsername("testuser")).willReturn(Optional.of(user));
         given(postRepository.save(post)).willReturn(post);
 
-        // Mocking for "Java" (new tag)
-        given(tagRepository.findByName("Java")).willReturn(Optional.empty());
-        given(tagRepository.save(any(Tag.class))).willAnswer(invocation -> {
-            Tag t = invocation.getArgument(0);
-            t.setId(10L); // simulate saving
-            return t;
-        });
-
-        // Mocking for "Spring" (existing tag)
+        // Mocking for tags
         Tag springTag = new Tag("Spring");
         springTag.setId(11L);
-        given(tagRepository.findByName("Spring")).willReturn(Optional.of(springTag));
+        
+        // Batch find
+        given(tagRepository.findByNameIn(any())).willReturn(Arrays.asList(springTag)); // "Spring" exists
+        
+        // Batch save for "Java"
+        given(tagRepository.saveAll(any())).willAnswer(invocation -> {
+            List<Tag> tags = invocation.getArgument(0);
+            tags.forEach(t -> t.setId(10L));
+            return tags;
+        });
 
-        Post createdPost = postService.createPost(post, 1L, tagString);
+        Post createdPost = postService.createPost(post, "testuser", tagString);
 
         assertThat(createdPost).isNotNull();
         assertThat(post.getTags()).hasSize(2);
@@ -115,11 +114,11 @@ public class PostServiceTest {
         given(postRepository.findById(postId)).willReturn(Optional.of(post));
         given(postRepository.save(any(Post.class))).willAnswer(i -> i.getArgument(0));
 
-        // Mock tag
-        given(tagRepository.findByName("NewTag")).willReturn(Optional.empty());
-        given(tagRepository.save(any(Tag.class))).willAnswer(i -> {
-            Tag t = i.getArgument(0);
-            t.setId(20L);
+        // Mock tag batch
+        given(tagRepository.findByNameIn(any())).willReturn(Collections.emptyList());
+        given(tagRepository.saveAll(any())).willAnswer(i -> {
+            List<Tag> t = i.getArgument(0);
+            t.forEach(tag -> tag.setId(20L));
             return t;
         });
 

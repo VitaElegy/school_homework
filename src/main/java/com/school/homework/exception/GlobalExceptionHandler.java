@@ -28,7 +28,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public String handleException(Exception e, Model model) {
-        model.addAttribute("errorMessage", e.getMessage());
+        // Log the error (In a real app, use a logger)
+        System.err.println("Internal Server Error: " + e.getMessage());
+        e.printStackTrace();
+        
+        // Do NOT expose internal error details to the user in production
+        model.addAttribute("errorMessage", "An unexpected error occurred. Please try again later.");
         return "error/error";
     }
 

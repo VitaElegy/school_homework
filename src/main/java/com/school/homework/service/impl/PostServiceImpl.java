@@ -6,6 +6,7 @@ import com.school.homework.dao.UserRepository;
 import com.school.homework.entity.Post;
 import com.school.homework.entity.Tag;
 import com.school.homework.entity.User;
+import com.school.homework.exception.ResourceNotFoundException;
 import com.school.homework.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,13 +16,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class PostServiceImpl implements PostService {
+
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
@@ -52,13 +54,13 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post getPostById(Long id) {
         return postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Post not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + id));
     }
 
     @Override
-    public Post createPost(Post post, Long userId, String tags) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+    public Post createPost(Post post, String username, String tags) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
         post.setAuthor(user);
 
         processTags(post, tags);
@@ -93,8 +95,9 @@ public class PostServiceImpl implements PostService {
         boolean isOwner = post.getAuthor().getUsername().equals(username);
 
         if (!isOwner) {
-             User user = userRepository.findByUsername(username).orElseThrow();
-             boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_ADMIN"));
+             User user = userRepository.findByUsername(username)
+                     .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+             boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getName().equals(ROLE_ADMIN));
              if (!isAdmin) {
                  throw new AccessDeniedException("You are not authorized to delete this post");
              }
@@ -111,16 +114,40 @@ public class PostServiceImpl implements PostService {
     }
     
     private void processTags(Post post, String tags) {
-        if (tags != null && !tags.trim().isEmpty()) {
-            String[] tagNames = tags.split(",");
-            for (String tagName : tagNames) {
-                String cleanName = tagName.trim();
-                if (!cleanName.isEmpty()) {
-                    Tag tag = tagRepository.findByName(cleanName)
-                            .orElseGet(() -> tagRepository.save(new Tag(cleanName)));
-                    post.addTag(tag);
-                }
+        if (tags == null || tags.trim().isEmpty()) {
+            return;
+        }
+
+        Set<String> tagNames = Arrays.stream(tags.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
+
+        if (tagNames.isEmpty()) {
+            return;
+        }
+
+        // Batch fetch existing tags to avoid N+1 select problem
+        List<Tag> existingTags = tagRepository.findByNameIn(tagNames);
+        Map<String, Tag> existingTagMap = existingTags.stream()
+                .collect(Collectors.toMap(Tag::getName, t -> t));
+
+        List<Tag> tagsToAdd = new ArrayList<>();
+        List<Tag> newTagsToSave = new ArrayList<>();
+
+        for (String tagName : tagNames) {
+            if (existingTagMap.containsKey(tagName)) {
+                tagsToAdd.add(existingTagMap.get(tagName));
+            } else {
+                newTagsToSave.add(new Tag(tagName));
             }
         }
+
+        if (!newTagsToSave.isEmpty()) {
+            List<Tag> savedTags = tagRepository.saveAll(newTagsToSave);
+            tagsToAdd.addAll(savedTags);
+        }
+
+        tagsToAdd.forEach(post::addTag);
     }
 }

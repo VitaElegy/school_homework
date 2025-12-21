@@ -6,6 +6,7 @@ import com.school.homework.dao.UserRepository;
 import com.school.homework.entity.Comment;
 import com.school.homework.entity.Post;
 import com.school.homework.entity.User;
+import com.school.homework.exception.ResourceNotFoundException;
 import com.school.homework.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,11 +30,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment addComment(Comment comment, Long postId, Long userId) {
+    public Comment addComment(Comment comment, Long postId, String username) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found: " + postId));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
 
         comment.setPost(post);
         comment.setAuthor(user);

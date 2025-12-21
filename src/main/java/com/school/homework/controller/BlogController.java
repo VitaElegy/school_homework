@@ -6,7 +6,6 @@ import com.school.homework.entity.Tag;
 import com.school.homework.entity.User;
 import com.school.homework.service.CommentService;
 import com.school.homework.service.PostService;
-import com.school.homework.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,13 +26,11 @@ import java.util.stream.Collectors;
 public class BlogController {
 
     private final PostService postService;
-    private final UserService userService;
     private final CommentService commentService;
 
     @Autowired
-    public BlogController(PostService postService, UserService userService, CommentService commentService) {
+    public BlogController(PostService postService, CommentService commentService) {
         this.postService = postService;
-        this.userService = userService;
         this.commentService = commentService;
     }
 
@@ -88,8 +85,7 @@ public class BlogController {
         if (bindingResult.hasErrors()) {
             return "blog/create_post";
         }
-        User user = userService.findUserByUsername(principal.getName());
-        postService.createPost(post, user.getId(), tagString);
+        postService.createPost(post, principal.getName(), tagString);
         return "redirect:/blog";
     }
 
@@ -136,8 +132,7 @@ public class BlogController {
     @PostMapping("/posts/{postId}/comments")
     @PreAuthorize("hasAuthority('COMMENT_CREATE')")
     public String addComment(@PathVariable Long postId, @ModelAttribute Comment comment, Principal principal) {
-        User user = userService.findUserByUsername(principal.getName());
-        commentService.addComment(comment, postId, user.getId());
+        commentService.addComment(comment, postId, principal.getName());
         return "redirect:/blog/posts/" + postId;
     }
 }
