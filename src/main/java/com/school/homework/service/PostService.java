@@ -10,7 +10,7 @@ public interface PostService {
     Page<Post> getAllPosts(Pageable pageable);
     Page<Post> searchPosts(String query, Pageable pageable);
     Post getPostById(Long id);
-    Post createPost(Post post, Long userId);
+    Post createPost(Post post, Long userId, String tags);
     void deletePost(Long id, String username);
 }
 

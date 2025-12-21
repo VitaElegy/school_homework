@@ -29,6 +29,9 @@
                 <a th:href="@{/blog/posts/{id}(id=${post.id})}" th:text="${post.title}">Post Title</a>
             </h5>
             <h6 class="card-subtitle mb-2 text-muted" th:text="'By ' + ${post.author.username} + ' on ' + ${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">Card subtitle</h6>
+            <div class="mb-2">
+                <span th:each="tag : ${post.tags}" class="badge badge-secondary mr-1" th:text="${tag.name}">Tag</span>
+            </div>
             <p class="card-text" th:text="${#strings.abbreviate(post.content, 100)}">Some quick example text...</p>
         </div>
     </div>

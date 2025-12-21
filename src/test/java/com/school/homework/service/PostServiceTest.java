@@ -1,8 +1,10 @@
 package com.school.homework.service;
 
 import com.school.homework.dao.PostRepository;
+import com.school.homework.dao.TagRepository;
 import com.school.homework.dao.UserRepository;
 import com.school.homework.entity.Post;
+import com.school.homework.entity.Tag;
 import com.school.homework.entity.User;
 import com.school.homework.service.impl.PostServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +26,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class PostServiceTest {
@@ -33,6 +37,9 @@ public class PostServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private TagRepository tagRepository;
 
     @InjectMocks
     private PostServiceImpl postService;
@@ -51,11 +58,37 @@ public class PostServiceTest {
         given(userRepository.findById(1L)).willReturn(Optional.of(user));
         given(postRepository.save(post)).willReturn(post);
 
-        Post createdPost = postService.createPost(post, 1L);
+        Post createdPost = postService.createPost(post, 1L, null);
 
         assertThat(createdPost).isNotNull();
         assertThat(createdPost.getTitle()).isEqualTo("Test Title");
         assertThat(createdPost.getAuthor()).isEqualTo(user);
+    }
+
+    @Test
+    public void whenCreatePostWithTags_thenReturnPostWithTags() {
+        String tagString = "Java, Spring";
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(postRepository.save(post)).willReturn(post);
+
+        // Mocking for "Java" (new tag)
+        given(tagRepository.findByName("Java")).willReturn(Optional.empty());
+        given(tagRepository.save(any(Tag.class))).willAnswer(invocation -> {
+            Tag t = invocation.getArgument(0);
+            t.setId(10L); // simulate saving
+            return t;
+        });
+
+        // Mocking for "Spring" (existing tag)
+        Tag springTag = new Tag("Spring");
+        springTag.setId(11L);
+        given(tagRepository.findByName("Spring")).willReturn(Optional.of(springTag));
+
+        Post createdPost = postService.createPost(post, 1L, tagString);
+
+        assertThat(createdPost).isNotNull();
+        assertThat(post.getTags()).hasSize(2);
+        assertThat(post.getTags()).extracting("name").contains("Java", "Spring");
     }
 
     @Test

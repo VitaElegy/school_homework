@@ -1,4 +1,4 @@
-# System Design & Documentation
+# System Design & Implementation Documentation
 
 ## 1. System Architecture Overview
 
@@ -36,7 +36,7 @@ graph TD
 3.  **Data Access Layer (DAO/Repository)**:
     *   Abstracts the underlying data storage mechanism.
     *   Uses Spring Data JPA for easy database interactions.
-    *   *Key Interfaces*: `UserRepository`, `PostRepository`, `CommentRepository`.
+    *   *Key Interfaces*: `UserRepository`, `PostRepository`, `CommentRepository`, `TagRepository`.
 
 4.  **Domain Model (Entity)**:
     *   Represents the data objects and database tables.
@@ -111,22 +111,70 @@ classDiagram
     Post "*" -- "*" Tag : labeled with
 ```
 
-### Entity Relationships Explanation
+### Entity Relationships
+*   **User - Role - Permission**: RBAC (Role-Based Access Control) structure. A `User` has `Roles`, a `Role` has `Permissions`.
+*   **User - Post**: One-to-Many.
+*   **User - Comment**: One-to-Many.
+*   **Post - Comment**: One-to-Many.
+*   **Post - Tag**: Many-to-Many.
 
-*   **User - Role - Permission**: A typical RBAC (Role-Based Access Control) structure. A `User` can have multiple `Roles`, and a `Role` is composed of multiple granular `Permissions`.
-*   **User - Post**: One-to-Many. A single user writes multiple posts.
-*   **User - Comment**: One-to-Many. A single user can write multiple comments.
-*   **Post - Comment**: One-to-Many. A post can have many comments associated with it.
-*   **Post - Tag**: Many-to-Many. A post can have multiple tags, and a tag can be associated with multiple posts.
+---
 
-## 3. Technology Stack
+## 3. Implemented Features
 
-*   **Backend Framework**: Spring Boot 3.x
-*   **Build Tool**: Maven
-*   **Language**: Java 17+
-*   **Database**: H2 (In-Memory for Dev) / MySQL (Production ready)
-*   **ORM**: Spring Data JPA / Hibernate
-*   **Template Engine**: Thymeleaf
-*   **Security**: Spring Security (BCrypt, Form Login)
-*   **Testing**: JUnit 5, Mockito, Spring Boot Test
+### 3.1 User Management
+*   **Registration**: Users can sign up with username, email, and password. Password complexity and uniqueness checks are enforced.
+*   **Authentication**: Custom `UserDetailsService` implementation using Spring Security. Support for form-based login.
+*   **Authorization**: Users are assigned default `ROLE_USER`. Admin users can be pre-seeded.
 
+### 3.2 Blog Management
+*   **Create Post**: Authenticated users with `POST_CREATE` permission can create new posts.
+*   **Rich Content**: Posts support a title and text content.
+*   **Tagging System**: 
+    *   Users can add tags (comma-separated) when creating a post.
+    *   Tags are automatically de-duplicated and reused if they already exist in the database.
+*   **Delete Post**: 
+    *   Post owners can delete their own posts.
+    *   Admin users can delete any post.
+*   **Listing**: 
+    *   Paginated view of all posts.
+    *   Sorting by creation date (newest first).
+    *   **Search**: Full-text search capability for post titles and content.
+
+### 3.3 Comment System
+*   **Add Comment**: Authenticated users can leave comments on any post.
+*   **View Comments**: Comments are displayed chronologically on the post detail page.
+
+### 3.4 Frontend
+*   **Thymeleaf Templates**: Server-side rendering for responsive HTML pages.
+*   **Bootstrap Styling**: Uses Bootstrap 4 for layout and styling.
+*   **Dynamic Elements**: 
+    *   Conditional rendering based on auth state (e.g., "Login" vs "Logout" buttons).
+    *   Conditional buttons (e.g., "Delete Post" only visible to owner/admin).
+    *   Form validation feedback.
+
+---
+
+## 4. Security & Testing
+
+### 4.1 Security Configuration
+*   **BCrypt Hashing**: Passwords are securely hashed before storage.
+*   **Method Level Security**: `@PreAuthorize` annotations protect service/controller methods (e.g., `hasAuthority('POST_CREATE')`).
+*   **CSRF Protection**: Enabled by default in Spring Security.
+
+### 4.2 Automated Testing
+*   **Unit Tests**: Service layer is tested using **JUnit 5** and **Mockito**.
+    *   `PostServiceTest`: Verifies post creation, tagging logic, and retrieval.
+    *   `CommentServiceTest`: Verifies comment addition.
+    *   `UserServiceTest`: Verifies user registration and role assignment.
+
+---
+
+## 5. Technology Stack
+
+*   **Backend**: Spring Boot 3.2.0, Java 17
+*   **Database**: H2 (In-Memory) / Spring Data JPA
+*   **Security**: Spring Security 6
+*   **Frontend**: Thymeleaf, Bootstrap 4
+*   **Build**: Maven
+*   **Testing**: JUnit 5, Mockito

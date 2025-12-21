@@ -77,12 +77,12 @@ public class BlogController {
 
     @PostMapping("/posts")
     @PreAuthorize("hasAuthority('POST_CREATE')")
-    public String createPost(@Valid @ModelAttribute Post post, BindingResult bindingResult, Principal principal) {
+    public String createPost(@Valid @ModelAttribute Post post, BindingResult bindingResult, @RequestParam(required = false) String tagString, Principal principal) {
         if (bindingResult.hasErrors()) {
             return "blog/create_post";
         }
         User user = userService.findUserByUsername(principal.getName());
-        postService.createPost(post, user.getId());
+        postService.createPost(post, user.getId(), tagString);
         return "redirect:/blog";
     }
 
