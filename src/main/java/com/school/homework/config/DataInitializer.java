@@ -7,6 +7,7 @@ import com.school.homework.dao.UserRepository;
 import com.school.homework.entity.Permission;
 import com.school.homework.entity.Role;
 import com.school.homework.entity.User;
+import com.school.homework.service.PostImportService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -48,7 +49,8 @@ public class DataInitializer {
     public CommandLineRunner initData(RoleRepository roleRepository,
                                       PermissionRepository permissionRepository,
                                       UserRepository userRepository,
-                                      PasswordEncoder passwordEncoder) {
+                                      PasswordEncoder passwordEncoder,
+                                      PostImportService postImportService) {
     return args -> {
             // 1. Create Permissions
             Permission postCreate = createPermissionIfNotFound(permissionRepository, AppConstants.PERM_POST_CREATE);
@@ -86,6 +88,9 @@ public class DataInitializer {
                 userRepository.save(user);
                 logger.info("Standard user created.");
             }
+
+            // 5. Import Posts from Markdown
+            postImportService.importPostsFromResources();
         };
     }
 
