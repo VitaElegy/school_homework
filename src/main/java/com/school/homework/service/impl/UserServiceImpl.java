@@ -4,6 +4,7 @@ import com.school.homework.dao.RoleRepository;
 import com.school.homework.dao.UserRepository;
 import com.school.homework.dto.RegisterDto;
 import com.school.homework.dto.UserDto;
+import com.school.homework.dto.UserProfileDto;
 import com.school.homework.entity.Role;
 import com.school.homework.entity.User;
 import com.school.homework.service.UserService;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @Transactional
@@ -58,6 +60,29 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserDtoByUsername(String username) {
         User user = findUserByUsername(username);
         return convertToDto(user);
+    }
+
+    @Override
+    public void updateUserProfile(String username, UserProfileDto userProfileDto) {
+        User user = findUserByUsername(username);
+
+        // Update Email
+        if (!user.getEmail().equals(userProfileDto.getEmail())) {
+            if (userRepository.findByEmail(userProfileDto.getEmail()).isPresent()) {
+                throw new com.school.homework.exception.DuplicateResourceException("Email already exists");
+            }
+            user.setEmail(userProfileDto.getEmail());
+        }
+
+        // Update Password
+        if (StringUtils.hasText(userProfileDto.getNewPassword())) {
+            if (!userProfileDto.getNewPassword().equals(userProfileDto.getConfirmNewPassword())) {
+                throw new IllegalArgumentException("Passwords do not match");
+            }
+            user.setPassword(passwordEncoder.encode(userProfileDto.getNewPassword()));
+        }
+        
+        userRepository.save(user);
     }
 
     private UserDto convertToDto(User user) {
