@@ -4,58 +4,279 @@
 <body>
 <div th:replace="~{fragments/header :: header}"></div>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow border-0 rounded-lg">
-                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
-                    <h2 class="font-weight-bold text-dark mb-0">Create New Post</h2>
-                    <p class="text-muted">Share your knowledge with the world</p>
+<!-- Marked.js for markdown rendering -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<!-- Highlight.js for syntax highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+<style>
+    .editor-container {
+        display: flex;
+        gap: 20px;
+        height: 600px;
+        position: relative;
+    }
+
+    .editor-pane, .preview-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        background: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .preview-pane {
+        background: #fcfcfc;
+        overflow: hidden; /* Header stays, content scrolls */
+    }
+
+    .pane-header {
+        padding: 10px 15px;
+        border-bottom: 1px solid #eee;
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.9rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    .editor-textarea {
+        flex: 1;
+        width: 100%;
+        border: none;
+        padding: 15px;
+        resize: none;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        outline: none;
+        background: transparent;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    .preview-content {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        font-size: 14px;
+    }
+
+    /* Layout Modes */
+    .editor-container.mode-edit-only .preview-pane {
+        display: none;
+    }
+
+    .editor-container.mode-preview-only .editor-pane {
+        display: none;
+    }
+
+    /* Fullscreen specific fixes if needed, but container size handles it */
+
+    .markdown-body img {
+        max-width: 100%;
+    }
+
+    /* Editor Toolbar */
+    .editor-toolbar {
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    .mode-switch-btn {
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .mode-switch-btn.active {
+        background-color: #e9ecef;
+        color: #333;
+        font-weight: 600;
+    }
+
+    /* Markdown Styles consistency */
+    .preview-content h1 { font-size: 1.8em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+    .preview-content h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+    .preview-content pre { background: #f6f8fa; padding: 16px; border-radius: 6px; }
+</style>
+
+<div class="container-fluid mt-4" style="max-width: 1400px;"> <!-- Use wider container for split view -->
+    <form th:action="@{/blog/posts}" th:object="${post}" method="post" id="postForm">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="font-weight-bold text-dark mb-0">Create New Post</h3>
+                    <div>
+                        <a href="/blog" class="btn btn-light mr-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-paper-plane mr-1"></i> Publish
+                        </button>
+                    </div>
                 </div>
-                <div class="card-body px-4 pb-4">
-                    <form th:action="@{/blog/posts}" th:object="${post}" method="post">
 
-                        <!-- Title -->
-                        <div class="form-group">
-                            <label for="title" class="font-weight-bold">Title</label>
-                            <input type="text" class="form-control form-control-lg" id="title" th:field="*{title}" placeholder="Enter a catchy title"
-                                   th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''">
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
-                        </div>
-
-                        <!-- Content -->
-                        <div class="form-group">
-                            <label for="content" class="font-weight-bold">Content</label>
-                            <textarea class="form-control" id="content" th:field="*{content}" rows="12" placeholder="Write your content here (Markdown supported)..."
-                                      th:classappend="${#fields.hasErrors('content')} ? 'is-invalid' : ''"></textarea>
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
-                            <small class="form-text text-muted">Supports Markdown: **bold**, *italic*, # Headers, `code`, etc.</small>
-                        </div>
-
-                        <!-- Tags -->
-                        <div class="form-group">
-                            <label for="tagString" class="font-weight-bold">Tags</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-light"><i class="fas fa-tags"></i></span>
-                                </div>
-                                <input type="text" class="form-control" id="tagString" th:field="*{tagString}" placeholder="e.g. java, spring, school (comma separated)">
-                            </div>
-                            <small class="form-text text-muted">Separate tags with commas.</small>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="d-flex justify-content-end mt-4">
-                            <a href="/blog" class="btn btn-light mr-3">Cancel</a>
-                            <button type="submit" class="btn btn-primary px-4">
-                                <i class="fas fa-paper-plane mr-1"></i> Publish Post
-                            </button>
-                        </div>
-                    </form>
+                <!-- Title & Meta Inputs -->
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <input type="text" class="form-control form-control-lg" id="title" th:field="*{title}" placeholder="Post Title"
+                               th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control form-control-lg" id="tagString" th:field="*{tagString}" placeholder="Tags (comma separated)">
+                    </div>
                 </div>
+
+                <!-- Editor Toolbar -->
+                <div class="editor-toolbar">
+                    <div class="d-flex align-items-center">
+                        <span class="mr-3 font-weight-bold text-muted"><i class="fab fa-markdown mr-1"></i> Markdown</span>
+                        <!-- Placeholder for future editor types drop-down -->
+                        <select class="custom-select custom-select-sm" style="width: auto;" id="editorTypeSelector">
+                            <option value="markdown" selected>Markdown Editor</option>
+                            <option value="richtext" disabled>Rich Text (Coming Soon)</option>
+                        </select>
+                    </div>
+
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary mode-switch-btn" data-mode="mode-edit-only" title="Edit Only">
+                            <i class="fas fa-pen"></i> Edit
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary mode-switch-btn active" data-mode="mode-split" title="Split View">
+                            <i class="fas fa-columns"></i> Split
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary mode-switch-btn" data-mode="mode-preview-only" title="Preview Only">
+                            <i class="fas fa-eye"></i> Preview
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Split Editor Area -->
+                <div class="editor-container" id="editorContainer">
+                    <!-- Edit Pane -->
+                    <div class="editor-pane">
+                        <div class="pane-header">
+                            <span>Source Code</span>
+                            <span class="badge badge-light">Markdown</span>
+                        </div>
+                        <textarea class="editor-textarea" id="content" th:field="*{content}"
+                                  placeholder="Type your markdown here..."></textarea>
+                        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+                    </div>
+
+                    <!-- Preview Pane -->
+                    <div class="preview-pane">
+                        <div class="pane-header">
+                            <span>Live Preview</span>
+                            <span class="text-muted small"><i class="fas fa-sync-alt fa-spin" id="syncIcon" style="display:none"></i></span>
+                        </div>
+                        <div class="preview-content markdown-body" id="previewContent">
+                            <!-- Rendered content goes here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-2 text-muted small text-right">
+                    <i class="fab fa-markdown"></i> Markdown supported
+                </div>
+
             </div>
         </div>
-    </div>
+    </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const textarea = document.getElementById('content');
+        const preview = document.getElementById('previewContent');
+        const container = document.getElementById('editorContainer');
+        const syncIcon = document.getElementById('syncIcon');
+        const modeButtons = document.querySelectorAll('.mode-switch-btn');
+
+        // Configure Marked.js
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            highlight: function(code, lang) {
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                return hljs.highlight(code, { language }).value;
+            }
+        });
+
+        // Live Preview Function
+        function updatePreview() {
+            syncIcon.style.display = 'inline-block';
+            const markdownText = textarea.value;
+            const htmlContent = marked.parse(markdownText);
+            preview.innerHTML = htmlContent;
+
+            // Re-highlight code blocks inside preview if marked's highlight option isn't enough (it usually is)
+            // But sometimes dynamic updates need re-trigger.
+            // marked handles it if configured, but let's be safe:
+            // document.querySelectorAll('pre code').forEach((block) => {
+            //     hljs.highlightElement(block);
+            // });
+
+            setTimeout(() => { syncIcon.style.display = 'none'; }, 200);
+        }
+
+        // Initial Render
+        updatePreview();
+
+        // Event Listener for typing
+        textarea.addEventListener('input', updatePreview);
+
+        // Synchronized Scrolling (Basic)
+        textarea.addEventListener('scroll', function() {
+            if (!container.classList.contains('mode-split')) return;
+            const percentage = textarea.scrollTop / (textarea.scrollHeight - textarea.offsetHeight);
+            preview.scrollTop = percentage * (preview.scrollHeight - preview.offsetHeight);
+        });
+
+        // Mode Switching Logic
+        modeButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all
+                modeButtons.forEach(b => b.classList.remove('active', 'btn-secondary'));
+                modeButtons.forEach(b => b.classList.add('btn-outline-secondary'));
+
+                // Add active to clicked
+                this.classList.add('active', 'btn-secondary');
+                this.classList.remove('btn-outline-secondary');
+
+                // Update Container Class
+                const mode = this.getAttribute('data-mode');
+
+                // Reset classes
+                container.classList.remove('mode-edit-only', 'mode-split', 'mode-preview-only');
+
+                // Apply new mode (Split is default style, others are overrides)
+                if (mode !== 'mode-split') {
+                    container.classList.add(mode);
+                } else {
+                    container.classList.add('mode-split');
+                }
+            });
+        });
+
+        // Ensure split mode is default in class list logic
+        container.classList.add('mode-split');
+    });
+</script>
 </body>
 </html>

@@ -31,7 +31,7 @@ public class ProfileController {
         userProfileDto.setUsername(user.getUsername());
         userProfileDto.setEmail(user.getEmail());
         userProfileDto.setCurrentAvatar(user.getAvatar());
-        
+
         model.addAttribute("profile", userProfileDto);
         return "profile";
     }
@@ -53,7 +53,7 @@ public class ProfileController {
             // Need to reload current avatar
             User user = userService.findUserByUsername(principal.getName());
             userProfileDto.setCurrentAvatar(user.getAvatar());
-            return "profile"; 
+            return "profile";
         } catch (Exception e) {
             model.addAttribute("errorMessage", "An unexpected error occurred: " + e.getMessage());
             // Need to reload current avatar
@@ -61,14 +61,14 @@ public class ProfileController {
             userProfileDto.setCurrentAvatar(user.getAvatar());
             return "profile";
         }
-        
+
         userProfileDto.setNewPassword("");
         userProfileDto.setConfirmNewPassword("");
-        
+
         // Reload avatar after success
         User updatedUser = userService.findUserByUsername(principal.getName());
         userProfileDto.setCurrentAvatar(updatedUser.getAvatar());
-        
+
         return "profile";
     }
 }

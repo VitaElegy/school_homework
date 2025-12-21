@@ -136,7 +136,7 @@ classDiagram
 
 ### 3.2 Blog Management
 *   **Create Post**: Authenticated users with `POST_CREATE` permission can create new posts.
-*   **Rich Content**: 
+*   **Rich Content**:
     *   Posts support **Markdown** syntax (GFM).
     *   Automatic **Syntax Highlighting** for code blocks using `Highlight.js`.
 *   **Tagging System**:
@@ -165,7 +165,7 @@ classDiagram
 
 ### 3.4 Frontend
 *   **Thymeleaf Templates**: Server-side rendering for responsive HTML pages.
-*   **Modern UI**: 
+*   **Modern UI**:
     *   Custom CSS (`style.css`) + Bootstrap 4.
     *   Card-based layouts with hover effects.
     *   FontAwesome icons for visual enhancement.

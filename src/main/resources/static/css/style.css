@@ -1,14 +1,15 @@
 :root {
-    --primary-color: #4a90e2;
-    --primary-dark: #357abd;
+    --primary-color: #667eea;
+    --primary-dark: #764ba2;
     --secondary-color: #6c757d;
-    --background-color: #f8f9fa;
+    --background-color: #f4f6f9;
     --card-bg: #ffffff;
-    --text-color: #333333;
-    --text-muted: #6c757d;
+    --text-color: #2d3748;
+    --text-muted: #718096;
     --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-    --radius: 8px;
+    --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
+    --radius: 12px;
 }
 
 body {
@@ -21,12 +22,24 @@ body {
 /* Navbar */
 .navbar {
     box-shadow: var(--shadow-md);
-    background: linear-gradient(135deg, #2c3e50, #4ca1af) !important; /* Elegant gradient */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; /* Unified Purple Gradient */
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
 }
 
 .navbar-brand {
     font-weight: 700;
     letter-spacing: 0.5px;
+    font-size: 1.35rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.nav-link:hover {
+    opacity: 0.85;
 }
 
 /* Cards */
@@ -36,7 +49,7 @@ body {
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s, box-shadow 0.2s;
     background-color: var(--card-bg);
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .card:hover {
@@ -44,13 +57,15 @@ body {
 }
 
 .post-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
 }
 
 .card-title a {
     color: var(--text-color);
     text-decoration: none;
     transition: color 0.2s;
+    font-weight: 600;
 }
 
 .card-title a:hover {
@@ -59,56 +74,71 @@ body {
 
 /* Buttons */
 .btn {
-    border-radius: 20px; /* Pill shape */
-    padding: 8px 20px;
-    font-weight: 500;
+    border-radius: 50px; /* Pill shape */
+    padding: 8px 24px;
+    font-weight: 600;
     transition: all 0.3s;
+    letter-spacing: 0.5px;
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
+    background: linear-gradient(to right, #667eea, #764ba2);
+    border: none;
+    color: white;
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-dark);
-    border-color: var(--primary-dark);
+    background: linear-gradient(to right, #764ba2, #667eea);
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+}
+
+.btn-outline-light {
+    border-width: 2px;
+}
+
+.btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
 }
 
 /* Forms */
 .form-control {
     border-radius: var(--radius);
-    padding: 10px 15px;
-    border: 1px solid #ced4da;
+    padding: 12px 15px;
+    border: 1px solid #e2e8f0;
+    background-color: #f8f9fa;
+    transition: all 0.2s;
 }
 
 .form-control:focus {
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
     border-color: var(--primary-color);
 }
 
 /* Badges/Tags */
 .badge {
-    padding: 6px 10px;
-    font-weight: 500;
-    border-radius: 4px;
+    padding: 6px 12px;
+    font-weight: 600;
+    border-radius: 30px;
 }
 
 .badge-info {
-    background-color: #e3f2fd;
-    color: #1976d2;
+    background-color: rgba(102, 126, 234, 0.1);
+    color: var(--primary-color);
 }
 
 .badge-secondary {
-    background-color: #f1f3f5;
-    color: #495057;
+    background-color: #edf2f7;
+    color: #718096;
 }
 
-/* Auth Pages */
+/* Auth Pages (For backward compatibility, but login-page class overrides are preferred) */
 .auth-card {
     margin-top: 50px;
     padding: 20px;
+    border-radius: 15px;
 }
 
 .auth-header {
@@ -126,17 +156,108 @@ body {
 .post-content {
     font-size: 1.1rem;
     line-height: 1.8;
-    color: #2c3e50;
+    color: #2d3748;
 }
 
 .comment-card {
     background-color: #f8f9fa;
     border-left: 4px solid var(--primary-color);
+    border-radius: var(--radius);
 }
 
 /* Alerts */
 .alert {
     border-radius: var(--radius);
     border: none;
+    box-shadow: var(--shadow-sm);
 }
 
+/* --- New Modern Login/Register Styles (Consistent with Main App now) --- */
+body.login-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: fadeIn 0.6s ease-out;
+    background-color: white;
+}
+
+.login-header {
+    background: #fff;
+    padding: 40px 30px 10px;
+    text-align: center;
+}
+
+.login-header h3 {
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 10px;
+}
+
+.login-body {
+    padding: 30px 40px 40px;
+    background: #fff;
+}
+
+/* Specific form control override for login page to match main inputs but rounded */
+.login-page .form-control {
+    border-radius: 50px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: #f7fafc;
+    border: 1px solid #edf2f7;
+    height: 50px;
+}
+
+.login-page .form-control:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(118, 75, 162, 0.1);
+    border-color: #764ba2;
+}
+
+.btn-login {
+    border-radius: 50px;
+    background: linear-gradient(to right, #667eea, #764ba2);
+    border: none;
+    padding: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 0.2s, box-shadow 0.2s;
+    color: white;
+    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(118, 75, 162, 0.4);
+    background: linear-gradient(to right, #764ba2, #667eea);
+    color: white;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.brand-logo {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: white;
+    font-size: 28px;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}

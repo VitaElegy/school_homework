@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
             }
             user.setPassword(passwordEncoder.encode(userProfileDto.getNewPassword()));
         }
-        
+
         // Update Avatar
         if (userProfileDto.getAvatar() != null && !userProfileDto.getAvatar().isEmpty()) {
             // Delete old avatar if exists
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
             String fileName = fileStorageService.saveFile(userProfileDto.getAvatar());
             user.setAvatar(fileName);
         }
-        
+
         userRepository.save(user);
     }
 

@@ -18,7 +18,7 @@ public class UserProfileDto {
     private String newPassword;
 
     private String confirmNewPassword;
-    
+
     private MultipartFile avatar;
     private String currentAvatar; // For display
 }
