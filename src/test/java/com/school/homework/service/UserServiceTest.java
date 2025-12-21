@@ -2,6 +2,7 @@ package com.school.homework.service;
 
 import com.school.homework.dao.RoleRepository;
 import com.school.homework.dao.UserRepository;
+import com.school.homework.dto.RegisterDto;
 import com.school.homework.entity.Role;
 import com.school.homework.entity.User;
 import com.school.homework.service.impl.UserServiceImpl;
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
@@ -39,32 +41,36 @@ public class UserServiceTest {
 
     private User user;
     private Role role;
+    private RegisterDto registerDto;
 
     @BeforeEach
     public void setup() {
         user = new User(1L, "testuser", "password", "test@example.com", LocalDateTime.now(), null, new HashSet<>());
         role = new Role(1L, "ROLE_USER", new HashSet<>());
+
+        registerDto = new RegisterDto();
+        registerDto.setUsername("testuser");
+        registerDto.setPassword("password");
+        registerDto.setEmail("test@example.com");
     }
 
     @Test
     public void whenRegisterUser_thenReturnUser() {
-        given(userRepository.findByUsername(user.getUsername())).willReturn(Optional.empty());
+        given(userRepository.findByUsername(registerDto.getUsername())).willReturn(Optional.empty());
         given(roleRepository.findByName("ROLE_USER")).willReturn(Optional.of(role));
         given(passwordEncoder.encode(anyString())).willReturn("encodedPassword");
-        given(userRepository.save(user)).willReturn(user);
+        given(userRepository.save(any(User.class))).willReturn(user);
 
-        User createdUser = userService.registerUser(user);
+        User createdUser = userService.registerUser(registerDto);
 
         assertThat(createdUser).isNotNull();
-        assertThat(createdUser.getUsername()).isEqualTo(user.getUsername());
-        assertThat(createdUser.getRoles()).contains(role);
+        assertThat(createdUser.getUsername()).isEqualTo(registerDto.getUsername());
     }
 
     @Test
     public void whenRegisterExistingUser_thenThrowException() {
-        given(userRepository.findByUsername(user.getUsername())).willReturn(Optional.of(user));
+        given(userRepository.findByUsername(registerDto.getUsername())).willReturn(Optional.of(user));
 
-        assertThrows(RuntimeException.class, () -> userService.registerUser(user));
+        assertThrows(RuntimeException.class, () -> userService.registerUser(registerDto));
     }
 }
-

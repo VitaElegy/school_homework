@@ -1,8 +1,10 @@
 package com.school.homework.service.impl;
 
+import com.school.homework.constant.AppConstants;
 import com.school.homework.dao.PostRepository;
 import com.school.homework.dao.TagRepository;
 import com.school.homework.dao.UserRepository;
+import com.school.homework.dto.PostDto;
 import com.school.homework.entity.Post;
 import com.school.homework.entity.Tag;
 import com.school.homework.entity.User;
@@ -22,8 +24,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class PostServiceImpl implements PostService {
-
-    private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
@@ -58,33 +58,57 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post createPost(Post post, String username, String tags) {
+    public PostDto getPostDtoById(Long id) {
+        Post post = getPostById(id);
+        PostDto dto = new PostDto();
+        dto.setId(post.getId());
+        dto.setTitle(post.getTitle());
+        dto.setContent(post.getContent());
+        dto.setStatus(post.getStatus());
+
+        String tagString = post.getTags().stream().map(Tag::getName).collect(Collectors.joining(", "));
+        dto.setTagString(tagString);
+
+        return dto;
+    }
+
+    @Override
+    public Post createPost(PostDto postDto, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+
+        Post post = new Post();
+        post.setTitle(postDto.getTitle());
+        post.setContent(postDto.getContent());
+        if (postDto.getStatus() != null) {
+            post.setStatus(postDto.getStatus());
+        }
         post.setAuthor(user);
 
-        processTags(post, tags);
+        processTags(post, postDto.getTagString());
 
         return postRepository.save(post);
     }
 
     @Override
-    public Post updatePost(Long id, Post postUpdates, String tags, String username) {
+    public Post updatePost(Long id, PostDto postDto, String username) {
         Post existingPost = getPostById(id);
 
         // Ownership check
         if (!existingPost.getAuthor().getUsername().equals(username)) {
-            // Check for admin role if we had easy access, or rely on controller security
              throw new AccessDeniedException("You are not authorized to edit this post");
         }
 
-        existingPost.setTitle(postUpdates.getTitle());
-        existingPost.setContent(postUpdates.getContent());
+        existingPost.setTitle(postDto.getTitle());
+        existingPost.setContent(postDto.getContent());
+        if (postDto.getStatus() != null) {
+            existingPost.setStatus(postDto.getStatus());
+        }
         existingPost.setUpdatedAt(LocalDateTime.now());
 
         // Clear existing tags and re-add to sync
         existingPost.getTags().clear();
-        processTags(existingPost, tags);
+        processTags(existingPost, postDto.getTagString());
 
         return postRepository.save(existingPost);
     }
@@ -97,7 +121,7 @@ public class PostServiceImpl implements PostService {
         if (!isOwner) {
              User user = userRepository.findByUsername(username)
                      .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
-             boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getName().equals(ROLE_ADMIN));
+             boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getName().equals(AppConstants.ROLE_ADMIN));
              if (!isAdmin) {
                  throw new AccessDeniedException("You are not authorized to delete this post");
              }
@@ -108,11 +132,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void incrementViewCount(Long id) {
-        Post post = getPostById(id);
-        post.setViewCount(post.getViewCount() + 1);
-        postRepository.save(post);
+        // Atomic update to prevent race conditions
+        postRepository.incrementViewCount(id);
     }
-    
+
     private void processTags(Post post, String tags) {
         if (tags == null || tags.trim().isEmpty()) {
             return;

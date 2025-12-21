@@ -1,11 +1,13 @@
 package com.school.homework.config;
 
+import com.school.homework.constant.AppConstants;
 import com.school.homework.dao.PermissionRepository;
 import com.school.homework.dao.RoleRepository;
 import com.school.homework.dao.UserRepository;
 import com.school.homework.entity.Permission;
 import com.school.homework.entity.Role;
 import com.school.homework.entity.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,53 +16,75 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Configuration
 public class DataInitializer {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
+
+    @Value("${app.admin.username}")
+    private String adminUsername;
+
+    @Value("${app.admin.password}")
+    private String adminPassword;
+
+    @Value("${app.admin.email}")
+    private String adminEmail;
+
+    @Value("${app.user.username}")
+    private String userUsername;
+
+    @Value("${app.user.password}")
+    private String userPassword;
+
+    @Value("${app.user.email}")
+    private String userEmail;
 
     @Bean
     public CommandLineRunner initData(RoleRepository roleRepository,
                                       PermissionRepository permissionRepository,
                                       UserRepository userRepository,
                                       PasswordEncoder passwordEncoder) {
-        return args -> {
+    return args -> {
             // 1. Create Permissions
-            Permission postCreate = createPermissionIfNotFound(permissionRepository, "POST_CREATE");
-            Permission postRead = createPermissionIfNotFound(permissionRepository, "POST_READ");
-            Permission postUpdate = createPermissionIfNotFound(permissionRepository, "POST_UPDATE");
-            Permission postDelete = createPermissionIfNotFound(permissionRepository, "POST_DELETE");
-            Permission commentCreate = createPermissionIfNotFound(permissionRepository, "COMMENT_CREATE");
-            Permission commentDelete = createPermissionIfNotFound(permissionRepository, "COMMENT_DELETE");
+            Permission postCreate = createPermissionIfNotFound(permissionRepository, AppConstants.PERM_POST_CREATE);
+            Permission postRead = createPermissionIfNotFound(permissionRepository, AppConstants.PERM_POST_READ);
+            Permission postUpdate = createPermissionIfNotFound(permissionRepository, AppConstants.PERM_POST_UPDATE);
+            Permission postDelete = createPermissionIfNotFound(permissionRepository, AppConstants.PERM_POST_DELETE);
+            Permission commentCreate = createPermissionIfNotFound(permissionRepository, AppConstants.PERM_COMMENT_CREATE);
+            Permission commentDelete = createPermissionIfNotFound(permissionRepository, AppConstants.PERM_COMMENT_DELETE);
 
             // 2. Create Roles
-            Role adminRole = createRoleIfNotFound(roleRepository, "ROLE_ADMIN",
+            Role adminRole = createRoleIfNotFound(roleRepository, AppConstants.ROLE_ADMIN,
                 new HashSet<>(Arrays.asList(postCreate, postRead, postUpdate, postDelete, commentCreate, commentDelete)));
 
-            Role userRole = createRoleIfNotFound(roleRepository, "ROLE_USER",
+            Role userRole = createRoleIfNotFound(roleRepository, AppConstants.ROLE_USER,
                 new HashSet<>(Arrays.asList(postCreate, postRead, commentCreate)));
 
             // 3. Create Admin User if not exists
-            if (userRepository.findByUsername("admin").isEmpty()) {
+            if (userRepository.findByUsername(adminUsername).isEmpty()) {
                 User admin = new User();
-                admin.setUsername("admin");
-                admin.setPassword(passwordEncoder.encode("admin123")); // Default password, change immediately!
-                admin.setEmail("admin@school.com");
+                admin.setUsername(adminUsername);
+                admin.setPassword(passwordEncoder.encode(adminPassword));
+                admin.setEmail(adminEmail);
                 admin.setRoles(new HashSet<>(Arrays.asList(adminRole)));
                 userRepository.save(admin);
-                System.out.println("Admin user created: admin / admin123");
+                logger.info("Admin user created.");
             }
 
             // 4. Create Standard User if not exists
-            if (userRepository.findByUsername("user").isEmpty()) {
+            if (userRepository.findByUsername(userUsername).isEmpty()) {
                 User user = new User();
-                user.setUsername("user");
-                user.setPassword(passwordEncoder.encode("password"));
-                user.setEmail("user@school.com");
+                user.setUsername(userUsername);
+                user.setPassword(passwordEncoder.encode(userPassword));
+                user.setEmail(userEmail);
                 user.setRoles(new HashSet<>(Arrays.asList(userRole)));
                 userRepository.save(user);
-                System.out.println("Standard user created: user / password");
+                logger.info("Standard user created.");
             }
         };
     }
@@ -84,4 +108,3 @@ public class DataInitializer {
         });
     }
 }
-

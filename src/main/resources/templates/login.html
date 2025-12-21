@@ -1,35 +1,46 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
-</head>
+<head th:replace="fragments/head :: common_head('Login')"></head>
 <body class="bg-light">
-<div class="container mt-5">
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header text-center">
-                    <h4>Login</h4>
-                </div>
+        <div class="col-md-5 col-lg-4">
+            <div class="card auth-card shadow-lg border-0 rounded-lg mt-5">
                 <div class="card-body">
-                    <div th:if="${param.error}" class="alert alert-danger">Invalid username or password.</div>
-                    <div th:if="${param.logout}" class="alert alert-success">You have been logged out.</div>
-                    <div th:if="${param.registered}" class="alert alert-success">Registration successful! Please login.</div>
+                    <div class="text-center mb-4">
+                        <h3 class="auth-header">Welcome Back</h3>
+                        <p class="text-muted">Sign in to continue</p>
+                    </div>
+
+                    <div th:if="${param.error}" class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle mr-1"></i> Invalid username or password.
+                    </div>
+                    <div th:if="${param.logout}" class="alert alert-info">
+                        <i class="fas fa-info-circle mr-1"></i> You have been logged out.
+                    </div>
+                    <div th:if="${param.registered}" class="alert alert-success">
+                        <i class="fas fa-check-circle mr-1"></i> Registration successful! Please login.
+                    </div>
+
                     <form action="/login" method="post">
                         <div class="form-group">
-                            <label>Username</label>
-                            <input type="text" name="username" class="form-control" required>
+                            <label><i class="fas fa-user mr-2 text-muted"></i>Username</label>
+                            <input type="text" name="username" class="form-control form-control-lg" placeholder="Enter username" required autofocus>
                         </div>
                         <div class="form-group">
-                            <label>Password</label>
-                            <input type="password" name="password" class="form-control" required>
+                            <label><i class="fas fa-lock mr-2 text-muted"></i>Password</label>
+                            <input type="password" name="password" class="form-control form-control-lg" placeholder="Enter password" required>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                        <button type="submit" class="btn btn-primary btn-block btn-lg mt-4">
+                            Login
+                        </button>
                     </form>
-                    <div class="mt-3 text-center">
-                        <a href="/register">Create an account</a>
+
+                    <div class="mt-4 text-center">
+                        <span class="text-muted">Don't have an account?</span>
+                        <a href="/register" class="font-weight-bold ml-1">Register Now</a>
                     </div>
                 </div>
             </div>
@@ -38,4 +49,3 @@
 </div>
 </body>
 </html>
-

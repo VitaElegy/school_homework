@@ -3,6 +3,7 @@ package com.school.homework.service.impl;
 import com.school.homework.dao.CommentRepository;
 import com.school.homework.dao.PostRepository;
 import com.school.homework.dao.UserRepository;
+import com.school.homework.dto.CommentDto;
 import com.school.homework.entity.Comment;
 import com.school.homework.entity.Post;
 import com.school.homework.entity.User;
@@ -30,14 +31,17 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment addComment(Comment comment, Long postId, String username) {
+    public Comment addComment(CommentDto commentDto, Long postId, String username) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
 
+        Comment comment = new Comment();
+        comment.setContent(commentDto.getContent());
         comment.setPost(post);
         comment.setAuthor(user);
+
         return commentRepository.save(comment);
     }
 

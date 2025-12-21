@@ -1,0 +1,142 @@
+:root {
+    --primary-color: #4a90e2;
+    --primary-dark: #357abd;
+    --secondary-color: #6c757d;
+    --background-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --text-muted: #6c757d;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --radius: 8px;
+}
+
+body {
+    background-color: var(--background-color);
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, #2c3e50, #4ca1af) !important; /* Elegant gradient */
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: var(--card-bg);
+    margin-bottom: 20px;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.post-card:hover {
+    transform: translateY(-2px);
+}
+
+.card-title a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.card-title a:hover {
+    color: var(--primary-color);
+}
+
+/* Buttons */
+.btn {
+    border-radius: 20px; /* Pill shape */
+    padding: 8px 20px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+/* Forms */
+.form-control {
+    border-radius: var(--radius);
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    border-color: var(--primary-color);
+}
+
+/* Badges/Tags */
+.badge {
+    padding: 6px 10px;
+    font-weight: 500;
+    border-radius: 4px;
+}
+
+.badge-info {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.badge-secondary {
+    background-color: #f1f3f5;
+    color: #495057;
+}
+
+/* Auth Pages */
+.auth-card {
+    margin-top: 50px;
+    padding: 20px;
+}
+
+.auth-header {
+    margin-bottom: 30px;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* Post Detail */
+.post-meta {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.post-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #2c3e50;
+}
+
+.comment-card {
+    background-color: #f8f9fa;
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Alerts */
+.alert {
+    border-radius: var(--radius);
+    border: none;
+}
+

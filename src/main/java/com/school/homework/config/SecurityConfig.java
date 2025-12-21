@@ -29,6 +29,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/h2-console/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/blog/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

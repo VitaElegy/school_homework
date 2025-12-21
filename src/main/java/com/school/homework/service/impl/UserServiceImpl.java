@@ -2,6 +2,7 @@ package com.school.homework.service.impl;
 
 import com.school.homework.dao.RoleRepository;
 import com.school.homework.dao.UserRepository;
+import com.school.homework.dto.RegisterDto;
 import com.school.homework.dto.UserDto;
 import com.school.homework.entity.Role;
 import com.school.homework.entity.User;
@@ -27,14 +28,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerUser(User user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+    public User registerUser(RegisterDto registerDto) {
+        if (userRepository.findByUsername(registerDto.getUsername()).isPresent()) {
             throw new com.school.homework.exception.DuplicateResourceException("Username already exists");
         }
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(registerDto.getEmail()).isPresent()) {
             throw new com.school.homework.exception.DuplicateResourceException("Email already exists");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        User user = new User();
+        user.setUsername(registerDto.getUsername());
+        user.setEmail(registerDto.getEmail());
+        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
         Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new RuntimeException("Default role ROLE_USER not found"));
@@ -64,5 +69,3 @@ public class UserServiceImpl implements UserService {
         return dto;
     }
 }
-
-

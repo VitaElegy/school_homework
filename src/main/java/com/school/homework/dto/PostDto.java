@@ -25,4 +25,5 @@ public class PostDto {
     private LocalDateTime updatedAt;
     private List<CommentDto> comments;
     private Set<TagDto> tags;
+    private String tagString; // For form binding (comma separated)
 }

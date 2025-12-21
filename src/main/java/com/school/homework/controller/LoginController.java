@@ -1,6 +1,6 @@
 package com.school.homework.controller;
 
-import com.school.homework.entity.User;
+import com.school.homework.dto.RegisterDto;
 import com.school.homework.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,17 +30,17 @@ public class LoginController {
 
     @GetMapping("/register")
     public String registerPage(Model model) {
-        model.addAttribute("user", new User());
+        model.addAttribute("user", new RegisterDto());
         return "register";
     }
 
     @PostMapping("/register")
-    public String register(@Valid @ModelAttribute User user, BindingResult bindingResult) {
+    public String register(@Valid @ModelAttribute("user") RegisterDto registerDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "register";
         }
         try {
-            userService.registerUser(user);
+            userService.registerUser(registerDto);
             return "redirect:/login?registered";
         } catch (Exception e) {
             bindingResult.rejectValue("username", "error.user", e.getMessage());

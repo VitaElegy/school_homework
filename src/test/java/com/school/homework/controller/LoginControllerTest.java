@@ -1,5 +1,6 @@
 package com.school.homework.controller;
 
+import com.school.homework.dto.RegisterDto;
 import com.school.homework.entity.User;
 import com.school.homework.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -45,10 +46,8 @@ public class LoginControllerTest {
     public void testRegisterSuccess() throws Exception {
         User user = new User();
         user.setUsername("newuser");
-        user.setPassword("password");
-        user.setEmail("new@example.com");
 
-        given(userService.registerUser(any(User.class))).willReturn(user);
+        given(userService.registerUser(any(RegisterDto.class))).willReturn(user);
 
         mockMvc.perform(post("/register")
                 .with(csrf())
@@ -62,7 +61,7 @@ public class LoginControllerTest {
     @Test
     @WithMockUser
     public void testRegisterFailure_UsernameExists() throws Exception {
-        given(userService.registerUser(any(User.class))).willThrow(new RuntimeException("Username already exists"));
+        given(userService.registerUser(any(RegisterDto.class))).willThrow(new RuntimeException("Username already exists"));
 
         mockMvc.perform(post("/register")
                 .with(csrf())

@@ -130,14 +130,16 @@ classDiagram
 ### 3.2 Blog Management
 *   **Create Post**: Authenticated users with `POST_CREATE` permission can create new posts.
 *   **Rich Content**: Posts support a title and text content.
-*   **Tagging System**: 
+*   **Tagging System**:
     *   Users can add tags (comma-separated) when creating a post.
     *   Tags are automatically de-duplicated and reused if they already exist in the database.
     *   **Optimization**: Uses batch processing to minimize database queries (prevents N+1 problem).
-*   **Delete Post**: 
+*   **View Counting**:
+    *   Atomic database updates for post view counts to ensure accuracy under high concurrency.
+*   **Delete Post**:
     *   Post owners can delete their own posts.
     *   Admin users can delete any post.
-*   **Listing**: 
+*   **Listing**:
     *   Paginated view of all posts.
     *   Sorting by creation date (newest first).
     *   **Search**: Full-text search capability for post titles and content.
@@ -149,7 +151,7 @@ classDiagram
 ### 3.4 Frontend
 *   **Thymeleaf Templates**: Server-side rendering for responsive HTML pages.
 *   **Bootstrap Styling**: Uses Bootstrap 4 for layout and styling.
-*   **Dynamic Elements**: 
+*   **Dynamic Elements**:
     *   Conditional rendering based on auth state (e.g., "Login" vs "Logout" buttons).
     *   Conditional buttons (e.g., "Delete Post" only visible to owner/admin).
     *   Form validation feedback.
@@ -161,6 +163,7 @@ classDiagram
 ### 4.1 Security Configuration
 *   **BCrypt Hashing**: Passwords are securely hashed before storage.
 *   **Method Level Security**: `@PreAuthorize` annotations protect service/controller methods (e.g., `hasAuthority('POST_CREATE')`).
+*   **Global Exception Handling**: Centralized handling of security exceptions (`AccessDeniedException`) providing user-friendly error pages and secure logging.
 *   **CSRF Protection**: Enabled by default in Spring Security.
 
 ### 4.2 Automated Testing
@@ -171,7 +174,7 @@ classDiagram
 
 ---
 
-## 5. Technology Stack
+## 5. Technology Stack & Code Quality
 
 *   **Backend**: Spring Boot 3.2.0, Java 17
 *   **Database**: H2 (In-Memory) / Spring Data JPA
@@ -179,3 +182,6 @@ classDiagram
 *   **Frontend**: Thymeleaf, Bootstrap 4
 *   **Build**: Maven
 *   **Testing**: JUnit 5, Mockito
+*   **Code Quality**:
+    *   **Constants**: Centralized `AppConstants` for Role and Permission management to avoid magic strings.
+    *   **Logging**: Structured logging (SLF4J) for critical path actions and errors.

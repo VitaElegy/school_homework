@@ -3,6 +3,7 @@ package com.school.homework.service;
 import com.school.homework.dao.PostRepository;
 import com.school.homework.dao.TagRepository;
 import com.school.homework.dao.UserRepository;
+import com.school.homework.dto.PostDto;
 import com.school.homework.entity.Post;
 import com.school.homework.entity.Tag;
 import com.school.homework.entity.User;
@@ -44,19 +45,25 @@ public class PostServiceTest {
 
     private User user;
     private Post post;
+    private PostDto postDto;
 
     @BeforeEach
     public void setup() {
         user = new User(1L, "testuser", "password", "test@example.com", LocalDateTime.now(), null, new HashSet<>());
         post = new Post(1L, "Test Title", "Test Content", com.school.homework.enums.PostStatus.DRAFT, user, null, new HashSet<>());
+
+        postDto = new PostDto();
+        postDto.setTitle("Test Title");
+        postDto.setContent("Test Content");
+        postDto.setStatus(com.school.homework.enums.PostStatus.DRAFT);
     }
 
     @Test
     public void whenCreatePost_thenReturnPost() {
         given(userRepository.findByUsername("testuser")).willReturn(Optional.of(user));
-        given(postRepository.save(post)).willReturn(post);
+        given(postRepository.save(any(Post.class))).willAnswer(invocation -> invocation.getArgument(0));
 
-        Post createdPost = postService.createPost(post, "testuser", null);
+        Post createdPost = postService.createPost(postDto, "testuser");
 
         assertThat(createdPost).isNotNull();
         assertThat(createdPost.getTitle()).isEqualTo("Test Title");
@@ -66,16 +73,18 @@ public class PostServiceTest {
     @Test
     public void whenCreatePostWithTags_thenReturnPostWithTags() {
         String tagString = "Java, Spring";
+        postDto.setTagString(tagString);
+
         given(userRepository.findByUsername("testuser")).willReturn(Optional.of(user));
-        given(postRepository.save(post)).willReturn(post);
+        given(postRepository.save(any(Post.class))).willAnswer(invocation -> invocation.getArgument(0));
 
         // Mocking for tags
         Tag springTag = new Tag("Spring");
         springTag.setId(11L);
-        
+
         // Batch find
         given(tagRepository.findByNameIn(any())).willReturn(Arrays.asList(springTag)); // "Spring" exists
-        
+
         // Batch save for "Java"
         given(tagRepository.saveAll(any())).willAnswer(invocation -> {
             List<Tag> tags = invocation.getArgument(0);
@@ -83,11 +92,11 @@ public class PostServiceTest {
             return tags;
         });
 
-        Post createdPost = postService.createPost(post, "testuser", tagString);
+        Post createdPost = postService.createPost(postDto, "testuser");
 
         assertThat(createdPost).isNotNull();
-        assertThat(post.getTags()).hasSize(2);
-        assertThat(post.getTags()).extracting("name").contains("Java", "Spring");
+        assertThat(createdPost.getTags()).hasSize(2);
+        assertThat(createdPost.getTags()).extracting("name").contains("Java", "Spring");
     }
 
     @Test
@@ -106,10 +115,11 @@ public class PostServiceTest {
     @Test
     public void whenUpdatePost_thenUpdateTitleAndTags() {
         Long postId = 1L;
-        Post updates = new Post();
+        PostDto updates = new PostDto();
         updates.setTitle("Updated Title");
         updates.setContent("Updated Content");
         String tags = "NewTag";
+        updates.setTagString(tags);
 
         given(postRepository.findById(postId)).willReturn(Optional.of(post));
         given(postRepository.save(any(Post.class))).willAnswer(i -> i.getArgument(0));
@@ -122,7 +132,7 @@ public class PostServiceTest {
             return t;
         });
 
-        Post updatedPost = postService.updatePost(postId, updates, tags, "testuser");
+        Post updatedPost = postService.updatePost(postId, updates, "testuser");
 
         assertThat(updatedPost.getTitle()).isEqualTo("Updated Title");
         assertThat(updatedPost.getContent()).isEqualTo("Updated Content");

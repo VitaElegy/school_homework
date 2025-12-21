@@ -1,62 +1,46 @@
-# School Homework Project
+# School Blog Project
 
-This is a Spring Boot application that manages Students and a Blog system.
+This is a simple Spring Boot Blog application.
 
-## Features
+## Prerequisites
 
-- **Student Management**: CRUD operations for Students.
-- **Blog System**:
-  - User Registration and Login (Session-based).
-  - Create, View, and Delete Blog Posts.
-  - Comment on Posts.
-- **Validation**: Data validation for all forms using Hibernate Validator.
-- **Exception Handling**: Global exception handling with a user-friendly error page.
-- **UI**: Thymeleaf templates with Bootstrap 4 styling and a common navigation bar.
-
-## Project Structure
-
-- `src/main/java/com/school/homework`
-    - `controller`: Web controllers (`BlogController`, `LoginController`).
-    - `service`: Business logic interfaces and implementations.
-    - `dao`: Data Access Objects (JPA Repositories).
-    - `entity`: JPA Entities (`User`, `Post`, `Comment`).
-    - `config`: Web, Security, and OpenAPI configuration.
-    - `exception`: Global exception handling.
-    - `dto`: Data Transfer Objects (Validated).
-- `src/main/resources/templates`
-    - `blog`: Blog pages.
-    - `fragments`: Shared UI components (Header).
-    - `error`: Error pages.
-
-## Code Quality Improvements
-
-This project has been refined to meet professional standards:
-
--   **API Documentation**: Integrated OpenAPI (Swagger UI) for comprehensive API endpoint documentation.
--   **Robust Validation**: Implemented strict validation on both Entities and DTOs using Jakarta Validation constraints (`@NotBlank`, `@Size`, etc.).
--   **Optimized Data Access**: Tag processing now uses batch fetching to prevent N+1 Select issues.
--   **Security**: Internal error details are hidden from users; proper Exception Handling mechanism is in place.
--   **Clean Architecture**: Controllers are decoupled from Repositories and `UserService`, delegating all business logic to dedicated Services.
--   **Robustness**: Standardized `ResourceNotFoundException` usage across the application.
+*   JDK 17 or higher
+*   Maven 3.x
 
 ## How to Run
 
-1.  **Prerequisites**: Java 17+, Maven.
-2.  **Build and Run**:
+1.  **Open a terminal** in the project root.
+2.  **Run the application** using Maven:
     ```bash
-    cd school_homework
     mvn spring-boot:run
     ```
-3.  **Access the Application**:
-    - **Home**: http://localhost:8080/
-    - **API Documentation (Swagger UI)**: http://localhost:8080/swagger-ui/index.html
-    - **Login**: http://localhost:8080/login (Create an account first via Register)
-    - **H2 Console**: http://localhost:8080/h2-console (JDBC URL: `jdbc:h2:mem:testdb`)
+    *Alternatively, you can build the JAR and run it:*
+    ```bash
+    mvn clean package
+    java -jar target/blog-0.0.1-SNAPSHOT.jar
+    ```
 
-## Tests
+## Accessing the Application
 
-Run unit and integration tests:
-```bash
-mvn test
-```
+*   **Home Page**: [http://localhost:8080](http://localhost:8080)
+*   **H2 Database Console**: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
+    *   **JDBC URL**: `jdbc:h2:mem:testdb`
+    *   **User**: `sa`
+    *   **Password**: `password`
 
+## Default Accounts
+
+The application initializes with two default users:
+
+| Role | Username | Password |
+| :--- | :--- | :--- |
+| **Admin** | `admin` | `admin123` |
+| **User** | `user` | `password` |
+
+## Features
+
+*   **Public Access**: View posts and comments.
+*   **User Role**: Create posts, comment on posts.
+*   **Admin Role**: Full control (manage all posts/comments).
+*   **Security**: Role-based access control (RBAC) using Spring Security.
+*   **UI**: Modern, responsive design using Bootstrap 4 and Thymeleaf.
