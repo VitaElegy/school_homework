@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="fragments/head :: common_head('Blog Posts')"></head>
+<head th:replace="~{fragments/head :: common_head('Blog Posts')}"></head>
 <body>
-<div th:replace="fragments/header :: header"></div>
+<div th:replace="~{fragments/header :: header}"></div>
 
 <div class="container mt-5">
     <div class="row align-items-center mb-4">

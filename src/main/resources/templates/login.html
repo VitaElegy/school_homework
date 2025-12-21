@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head :: common_head('Login')"></head>
+<head th:replace="~{fragments/head :: common_head('Login')}"></head>
 <body class="bg-light">
-<div th:replace="fragments/header :: header"></div>
+<div th:replace="~{fragments/header :: header}"></div>
 
 <div class="container">
     <div class="row justify-content-center">
@@ -24,7 +24,7 @@
                         <i class="fas fa-check-circle mr-1"></i> Registration successful! Please login.
                     </div>
 
-                    <form action="/login" method="post">
+                    <form th:action="@{/login}" method="post">
                         <div class="form-group">
                             <label><i class="fas fa-user mr-2 text-muted"></i>Username</label>
                             <input type="text" name="username" class="form-control form-control-lg" placeholder="Enter username" required autofocus>
