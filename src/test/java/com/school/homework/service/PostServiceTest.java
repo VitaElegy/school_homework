@@ -61,7 +61,7 @@ public class PostServiceTest {
         post.setContent("Test Content");
         post.setStatus(com.school.homework.enums.PostStatus.DRAFT);
         post.setAuthor(user);
-        
+
         postDto = new PostDto();
         postDto.setTitle("Test Title");
         postDto.setContent("Test Content");

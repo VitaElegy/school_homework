@@ -59,7 +59,7 @@ public class PostImportServiceImpl implements PostImportService {
         // Check deduplication (Simple logic: Check if a post with same title exists)
         try {
             // Note: Ideally PostService should expose a method to check existence or find by title
-            // But for now, we rely on search or we just try to create. 
+            // But for now, we rely on search or we just try to create.
             // Better: Let's assume we want to skip if title exists to avoid duplicates on every restart.
             boolean exists = postService.getAllPosts(org.springframework.data.domain.Pageable.unpaged())
                     .stream()
@@ -104,7 +104,7 @@ public class PostImportServiceImpl implements PostImportService {
 
     private ParsedPost parseFrontMatter(String fullContent) {
         ParsedPost result = new ParsedPost();
-        
+
         // Regex to match YAML Front Matter between --- and ---
         Pattern pattern = Pattern.compile("^---\\n(.*?)\\n---\\n(.*)", Pattern.DOTALL);
         Matcher matcher = pattern.matcher(fullContent);

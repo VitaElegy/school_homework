@@ -46,7 +46,7 @@ public class BlogController {
                             @RequestParam(defaultValue = "5") int size,
                             Model model) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        
+
         Page<Post> postPage = postService.searchPosts(criteria, pageable);
 
         model.addAttribute("posts", postPage.getContent());

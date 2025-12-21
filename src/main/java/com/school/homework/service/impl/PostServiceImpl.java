@@ -49,7 +49,7 @@ public class PostServiceImpl implements PostService {
     }
 
     // Deprecated methods removed or redirected if needed, but for now searchPosts replaces them.
-    
+
     @Override
     public Post getPostById(Long id) {
         return postRepository.findById(id)

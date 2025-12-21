@@ -51,12 +51,12 @@ public class UserServiceTest {
         user.setPassword("password");
         user.setEmail("test@example.com");
         user.setRoles(new HashSet<>());
-        
+
         role = new Role();
         role.setId(1L);
         role.setName("ROLE_USER");
         role.setPermissions(new HashSet<>());
-        
+
         registerDto = new RegisterDto();
         registerDto.setUsername("testuser");
         registerDto.setPassword("password");

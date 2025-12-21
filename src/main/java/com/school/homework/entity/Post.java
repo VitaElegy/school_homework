@@ -17,7 +17,7 @@ import java.util.Set;
 @Entity
 @Table(name = "posts")
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"tags", "comments", "author"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Post extends BaseEntity {

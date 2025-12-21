@@ -12,7 +12,7 @@ import java.util.Set;
 @Entity
 @Table(name = "tags")
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"posts"})
 @NoArgsConstructor
 public class Tag extends BaseEntity {
 

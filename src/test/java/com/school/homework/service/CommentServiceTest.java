@@ -48,7 +48,7 @@ public class CommentServiceTest {
         user.setUsername("testuser");
         user.setPassword("password");
         user.setEmail("test@example.com");
-        
+
         post = new Post();
         post.setId(1L);
         post.setTitle("Test Title");

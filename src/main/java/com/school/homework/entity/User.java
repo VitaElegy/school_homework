@@ -15,7 +15,7 @@ import java.util.HashSet;
 @Entity
 @Table(name = "users")
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"posts", "roles"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class User extends BaseEntity {
