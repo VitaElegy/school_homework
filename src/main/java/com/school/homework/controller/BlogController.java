@@ -25,20 +25,25 @@ import java.util.stream.Collectors;
 
 /**
  * 博客控制器
- * 
- * <p>处理博客文章和评论相关的 HTTP 请求。</p>
- * 
- * <p>主要功能：
+ *
+ * <p>
+ * 处理博客文章和评论相关的 HTTP 请求。
+ * </p>
+ *
+ * <p>
+ * 主要功能：
  * <ul>
- *   <li>文章列表展示和搜索</li>
- *   <li>文章详情查看</li>
- *   <li>文章创建、编辑、删除</li>
- *   <li>评论添加</li>
+ * <li>文章列表展示和搜索</li>
+ * <li>文章详情查看</li>
+ * <li>文章创建、编辑、删除</li>
+ * <li>评论添加</li>
  * </ul>
  * </p>
- * 
- * <p>路由前缀：/blog</p>
- * 
+ *
+ * <p>
+ * 路由前缀：/blog
+ * </p>
+ *
  * @author School Homework Team
  * @version 1.0
  */
@@ -48,18 +53,18 @@ public class BlogController {
 
     /** 文章服务 */
     private final PostService postService;
-    
+
     /** 评论服务 */
     private final CommentService commentService;
-    
+
     /** Markdown 渲染服务 */
     private final MarkdownService markdownService;
 
     /**
      * 构造函数注入依赖
-     * 
-     * @param postService 文章服务
-     * @param commentService 评论服务
+     *
+     * @param postService     文章服务
+     * @param commentService  评论服务
      * @param markdownService Markdown 渲染服务
      */
     @Autowired
@@ -73,20 +78,22 @@ public class BlogController {
 
     /**
      * 显示文章列表页面
-     * 
-     * <p>支持搜索和分页功能。</p>
-     * 
+     *
+     * <p>
+     * 支持搜索和分页功能。
+     * </p>
+     *
      * @param criteria 搜索条件（标题、内容、标签、作者）
-     * @param page 页码，从0开始，默认0
-     * @param size 每页大小，默认5
-     * @param model 视图模型
+     * @param page     页码，从0开始，默认0
+     * @param size     每页大小，默认5
+     * @param model    视图模型
      * @return 文章列表页面视图
      */
     @GetMapping
     public String listPosts(@ModelAttribute PostSearchCriteria criteria,
-                            @RequestParam(defaultValue = "0") int page,
-                            @RequestParam(defaultValue = "5") int size,
-                            Model model) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            Model model) {
         // 创建分页对象，按创建时间倒序排列
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
@@ -105,10 +112,12 @@ public class BlogController {
 
     /**
      * 显示文章详情页面
-     * 
-     * <p>查看文章时自动递增浏览次数，并将 Markdown 内容渲染为 HTML。</p>
-     * 
-     * @param id 文章ID
+     *
+     * <p>
+     * 查看文章时自动递增浏览次数，并将 Markdown 内容渲染为 HTML。
+     * </p>
+     *
+     * @param id    文章ID
      * @param model 视图模型
      * @return 文章详情页面视图
      */
@@ -116,7 +125,7 @@ public class BlogController {
     public String viewPost(@PathVariable Long id, Model model) {
         // 原子递增浏览次数
         postService.incrementViewCount(id);
-        
+
         // 获取文章
         Post post = postService.getPostById(id);
 
@@ -132,9 +141,11 @@ public class BlogController {
 
     /**
      * 显示创建文章表单
-     * 
-     * <p>需要 POST_CREATE 权限。</p>
-     * 
+     *
+     * <p>
+     * 需要 POST_CREATE 权限。
+     * </p>
+     *
      * @param model 视图模型
      * @return 创建文章页面视图
      */
@@ -147,17 +158,20 @@ public class BlogController {
 
     /**
      * 处理文章创建请求
-     * 
-     * <p>需要 POST_CREATE 权限。验证表单数据后创建文章。</p>
-     * 
-     * @param postDto 文章数据传输对象
+     *
+     * <p>
+     * 需要 POST_CREATE 权限。验证表单数据后创建文章。
+     * </p>
+     *
+     * @param postDto       文章数据传输对象
      * @param bindingResult 验证结果
-     * @param principal 当前登录用户
+     * @param principal     当前登录用户
      * @return 重定向到文章列表页面
      */
     @PostMapping("/posts")
     @PreAuthorize("hasAuthority('POST_CREATE')")
-    public String createPost(@Valid @ModelAttribute("post") PostDto postDto, BindingResult bindingResult, Principal principal) {
+    public String createPost(@Valid @ModelAttribute("post") PostDto postDto, BindingResult bindingResult,
+            Principal principal) {
         // 如果验证失败，返回表单页面显示错误
         if (bindingResult.hasErrors()) {
             return "blog/create_post";
@@ -169,11 +183,13 @@ public class BlogController {
 
     /**
      * 显示编辑文章表单
-     * 
-     * <p>需要 POST_UPDATE 权限。只有文章作者可以编辑自己的文章。</p>
-     * 
-     * @param id 文章ID
-     * @param model 视图模型
+     *
+     * <p>
+     * 需要 POST_UPDATE 权限。只有文章作者可以编辑自己的文章。
+     * </p>
+     *
+     * @param id        文章ID
+     * @param model     视图模型
      * @param principal 当前登录用户
      * @return 编辑文章页面视图或403错误页面
      */
@@ -184,12 +200,12 @@ public class BlogController {
         try {
             // 获取文章实体以检查所有权
             Post post = postService.getPostById(id);
-            
+
             // 检查是否为文章作者
             if (!post.getAuthor().getUsername().equals(principal.getName())) {
                 return "error/403";
             }
-            
+
             // 转换为DTO用于表单显示
             postDto = postService.getPostDtoById(id);
 
@@ -203,19 +219,22 @@ public class BlogController {
 
     /**
      * 处理文章更新请求
-     * 
-     * <p>需要 POST_UPDATE 权限。只有文章作者可以更新自己的文章。</p>
-     * 
-     * @param id 文章ID
-     * @param postDto 文章数据传输对象
+     *
+     * <p>
+     * 需要 POST_UPDATE 权限。只有文章作者可以更新自己的文章。
+     * </p>
+     *
+     * @param id            文章ID
+     * @param postDto       文章数据传输对象
      * @param bindingResult 验证结果
-     * @param principal 当前登录用户
-     * @param model 视图模型
+     * @param principal     当前登录用户
+     * @param model         视图模型
      * @return 重定向到文章详情页面或返回编辑表单
      */
     @PostMapping("/posts/{id}/edit")
     @PreAuthorize("hasAuthority('POST_UPDATE')")
-    public String updatePost(@PathVariable Long id, @Valid @ModelAttribute("post") PostDto postDto, BindingResult bindingResult, Principal principal, Model model) {
+    public String updatePost(@PathVariable Long id, @Valid @ModelAttribute("post") PostDto postDto,
+            BindingResult bindingResult, Principal principal, Model model) {
         // 如果验证失败，返回表单页面显示错误
         if (bindingResult.hasErrors()) {
             return "blog/edit_post";
@@ -231,10 +250,12 @@ public class BlogController {
 
     /**
      * 处理文章删除请求
-     * 
-     * <p>需要 POST_DELETE 权限。文章作者可以删除自己的文章，管理员可以删除任何文章。</p>
-     * 
-     * @param id 文章ID
+     *
+     * <p>
+     * 需要 POST_DELETE 权限。文章作者可以删除自己的文章，管理员可以删除任何文章。
+     * </p>
+     *
+     * @param id        文章ID
      * @param principal 当前登录用户
      * @return 重定向到文章列表页面
      */
@@ -250,19 +271,22 @@ public class BlogController {
 
     /**
      * 处理添加评论请求
-     * 
-     * <p>需要 COMMENT_CREATE 权限。认证用户可以评论文章。</p>
-     * 
-     * @param postId 文章ID
-     * @param commentDto 评论数据传输对象
+     *
+     * <p>
+     * 需要 COMMENT_CREATE 权限。认证用户可以评论文章。
+     * </p>
+     *
+     * @param postId        文章ID
+     * @param commentDto    评论数据传输对象
      * @param bindingResult 验证结果
-     * @param principal 当前登录用户
-     * @param model 视图模型
+     * @param principal     当前登录用户
+     * @param model         视图模型
      * @return 重定向到文章详情页面或返回文章详情页面显示错误
      */
     @PostMapping("/posts/{postId}/comments")
     @PreAuthorize("hasAuthority('COMMENT_CREATE')")
-    public String addComment(@PathVariable Long postId, @Valid @ModelAttribute("newComment") CommentDto commentDto, BindingResult bindingResult, Principal principal, Model model) {
+    public String addComment(@PathVariable Long postId, @Valid @ModelAttribute("newComment") CommentDto commentDto,
+            BindingResult bindingResult, Principal principal, Model model) {
         // 如果验证失败，重新加载文章以便正确显示错误
         if (bindingResult.hasErrors()) {
             Post post = postService.getPostById(postId);

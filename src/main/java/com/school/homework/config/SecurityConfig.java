@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Spring Security 安全配置类
- * 
+ *
  * <p>配置应用程序的安全策略，包括：
  * <ul>
  *   <li>URL 访问控制（哪些路径需要认证，哪些公开访问）</li>
@@ -26,14 +26,14 @@ import org.springframework.security.web.SecurityFilterChain;
  *   <li>认证提供者配置</li>
  * </ul>
  * </p>
- * 
+ *
  * <p>权限控制：
  * <ul>
  *   <li>使用 @EnableMethodSecurity 启用方法级安全</li>
  *   <li>在控制器方法上使用 @PreAuthorize 注解进行权限控制</li>
  * </ul>
  * </p>
- * 
+ *
  * @author School Homework Team
  * @version 1.0
  */
@@ -47,7 +47,7 @@ public class SecurityConfig {
 
     /**
      * 构造函数注入依赖
-     * 
+     *
      * @param userDetailsService 自定义用户详情服务
      */
     public SecurityConfig(CustomUserDetailsService userDetailsService) {
@@ -56,9 +56,9 @@ public class SecurityConfig {
 
     /**
      * 配置安全过滤器链
-     * 
+     *
      * <p>定义 URL 访问规则、登录/登出配置等。</p>
-     * 
+     *
      * @param http HttpSecurity 对象
      * @return 配置好的 SecurityFilterChain
      * @throws Exception 配置异常
@@ -95,9 +95,9 @@ public class SecurityConfig {
 
     /**
      * 配置认证提供者
-     * 
+     *
      * <p>使用自定义的 UserDetailsService 和密码编码器。</p>
-     * 
+     *
      * @return 配置好的 DaoAuthenticationProvider
      */
     @Bean
@@ -110,7 +110,7 @@ public class SecurityConfig {
 
     /**
      * 配置认证管理器
-     * 
+     *
      * @param authConfig 认证配置
      * @return 认证管理器
      * @throws Exception 配置异常
@@ -122,9 +122,9 @@ public class SecurityConfig {
 
     /**
      * 配置密码编码器
-     * 
+     *
      * <p>使用 BCrypt 算法加密密码。</p>
-     * 
+     *
      * @return BCrypt 密码编码器
      */
     @Bean

@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 数据初始化配置类
- * 
+ *
  * <p>在应用启动时自动执行数据初始化，包括：
  * <ul>
  *   <li>创建默认权限（POST_CREATE, POST_READ, POST_UPDATE, POST_DELETE, COMMENT_CREATE, COMMENT_DELETE）</li>
@@ -33,14 +33,14 @@ import org.slf4j.LoggerFactory;
  *   <li>从 Markdown 文件自动导入文章</li>
  * </ul>
  * </p>
- * 
+ *
  * <p>配置说明：
  * <ul>
  *   <li>默认用户信息在 application.properties 中配置</li>
  *   <li>如果用户已存在，则跳过创建（避免重复创建）</li>
  * </ul>
  * </p>
- * 
+ *
  * @author School Homework Team
  * @version 1.0
  */
@@ -75,9 +75,9 @@ public class DataInitializer {
 
     /**
      * 数据初始化 Bean
-     * 
+     *
      * <p>在应用启动后自动执行，初始化系统基础数据。</p>
-     * 
+     *
      * @param roleRepository 角色数据访问接口
      * @param permissionRepository 权限数据访问接口
      * @param userRepository 用户数据访问接口

@@ -16,9 +16,9 @@ import java.util.Set;
 
 /**
  * 文章实体类
- * 
+ *
  * <p>表示博客系统中的文章，包含文章内容、状态、标签等信息。</p>
- * 
+ *
  * <p>关系说明：
  * <ul>
  *   <li>多对一关系：每篇文章属于一个作者（User）</li>
@@ -26,14 +26,14 @@ import java.util.Set;
  *   <li>多对多关系：每篇文章可以有多个标签（Tag）</li>
  * </ul>
  * </p>
- * 
+ *
  * <p>内容格式：
  * <ul>
  *   <li>content 字段存储 Markdown 格式的原始内容</li>
  *   <li>显示时通过 MarkdownService 渲染为 HTML</li>
  * </ul>
  * </p>
- * 
+ *
  * @author School Homework Team
  * @version 1.0
  */
@@ -44,7 +44,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Post extends BaseEntity {
-    
+
     /**
      * 文章主键ID
      * 自增主键
@@ -121,7 +121,7 @@ public class Post extends BaseEntity {
     /**
      * 添加标签
      * 同时维护双向关系，确保数据一致性
-     * 
+     *
      * @param tag 要添加的标签
      */
     public void addTag(Tag tag) {
@@ -132,7 +132,7 @@ public class Post extends BaseEntity {
     /**
      * 移除标签
      * 同时维护双向关系，确保数据一致性
-     * 
+     *
      * @param tag 要移除的标签
      */
     public void removeTag(Tag tag) {

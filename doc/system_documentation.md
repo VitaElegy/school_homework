@@ -147,7 +147,7 @@ school_homework/
 
 #### 核心代码目录
 
-- **config/**: 存放 Spring Boot 配置类，包括安全配置、JPA配置、Web配置等
+- **config/**: 存放 Spring Boot 配置类，包括安全配置、JPA 配置、Web 配置等
 - **controller/**: 控制器层，处理 HTTP 请求，负责请求路由和参数验证
 - **service/**: 服务层，包含接口定义和实现类，封装业务逻辑
 - **dao/**: 数据访问层，Spring Data JPA Repository 接口，定义数据库操作方法
@@ -179,9 +179,9 @@ school_homework/
 - **构建工具**: Maven
 - **数据库**: H2 Database（文件模式）
 - **ORM**: Spring Data JPA + Hibernate
-- **安全框架**: Spring Security 6（RBAC模型）
+- **安全框架**: Spring Security 6（RBAC 模型）
 - **模板引擎**: Thymeleaf
-- **Markdown引擎**: commonmark-java 0.21.0
+- **Markdown 引擎**: commonmark-java 0.21.0
 - **前端框架**: Bootstrap 4
 
 ---

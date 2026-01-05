@@ -7,9 +7,9 @@ import lombok.AllArgsConstructor;
 
 /**
  * 权限实体类
- * 
+ *
  * <p>表示系统中的权限，用于细粒度的访问控制。</p>
- * 
+ *
  * <p>预定义权限：
  * <ul>
  *   <li>POST_CREATE: 创建文章权限</li>
@@ -20,14 +20,14 @@ import lombok.AllArgsConstructor;
  *   <li>COMMENT_DELETE: 删除评论权限</li>
  * </ul>
  * </p>
- * 
+ *
  * <p>权限分配：
  * <ul>
  *   <li>权限通过角色分配给用户</li>
  *   <li>一个用户可以有多个角色，从而拥有多个权限</li>
  * </ul>
  * </p>
- * 
+ *
  * @author School Homework Team
  * @version 1.0
  */
@@ -37,7 +37,7 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Permission {
-    
+
     /**
      * 权限主键ID
      * 自增主键

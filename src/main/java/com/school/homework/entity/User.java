@@ -14,9 +14,9 @@ import java.util.HashSet;
 
 /**
  * 用户实体类
- * 
+ *
  * <p>表示系统中的用户，包含用户的基本信息和关联关系。</p>
- * 
+ *
  * <p>关系说明：
  * <ul>
  *   <li>一个用户可以有多个文章（OneToMany）</li>
@@ -24,14 +24,14 @@ import java.util.HashSet;
  *   <li>一个用户可以有多个角色（ManyToMany）</li>
  * </ul>
  * </p>
- * 
+ *
  * <p>安全说明：
  * <ul>
  *   <li>密码使用 BCrypt 加密存储，不在实体类中加密</li>
  *   <li>角色使用 EAGER 加载，因为 Spring Security 需要立即访问</li>
  * </ul>
  * </p>
- * 
+ *
  * @author School Homework Team
  * @version 1.0
  */
@@ -42,7 +42,7 @@ import java.util.HashSet;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User extends BaseEntity {
-    
+
     /**
      * 用户主键ID
      * 自增主键
