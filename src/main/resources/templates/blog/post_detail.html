@@ -175,7 +175,7 @@
                     <!-- Comment List -->
                     <div th:each="comment : ${post.comments}" class="media mb-4 comment-card p-3 rounded">
                         <img th:if="${comment.author.avatar != null}" th:src="@{'/uploads/avatars/' + ${comment.author.avatar}}" class="d-flex mr-3 rounded-circle" width="50" height="50" style="object-fit: cover;">
-                        <img th:if="${comment.author.avatar == null}" class="d-flex mr-3 rounded-circle" src="https://via.placeholder.com/50" width="50" height="50" alt="Avatar">
+                        <i th:if="${comment.author.avatar == null}" class="fas fa-user-circle d-flex mr-3 text-secondary" style="font-size: 50px;"></i>
 
                         <div class="media-body">
                             <h6 class="mt-0 font-weight-bold" th:text="${comment.author.username}">User</h6>
