@@ -70,3 +70,6 @@ HELP.md
 data/*.db
 data/*.lock.db
 data/*.trace.db
+
+### Upload Files ###
+uploads/
