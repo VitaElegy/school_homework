@@ -25,7 +25,8 @@ public class UserServiceImpl implements UserService {
     private final FileStorageService fileStorageService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, FileStorageService fileStorageService) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder, FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -66,35 +67,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserProfile(String username, UserProfileDto userProfileDto) {
+    public void updateUserInfo(String username, com.school.homework.dto.UserInfoDto userInfoDto) {
         User user = findUserByUsername(username);
 
         // Update Email
-        if (!user.getEmail().equals(userProfileDto.getEmail())) {
-            if (userRepository.findByEmail(userProfileDto.getEmail()).isPresent()) {
+        if (!user.getEmail().equals(userInfoDto.getEmail())) {
+            if (userRepository.findByEmail(userInfoDto.getEmail()).isPresent()) {
                 throw new com.school.homework.exception.DuplicateResourceException("Email already exists");
             }
-            user.setEmail(userProfileDto.getEmail());
-        }
-
-        // Update Password
-        if (StringUtils.hasText(userProfileDto.getNewPassword())) {
-            if (!userProfileDto.getNewPassword().equals(userProfileDto.getConfirmNewPassword())) {
-                throw new IllegalArgumentException("Passwords do not match");
-            }
-            user.setPassword(passwordEncoder.encode(userProfileDto.getNewPassword()));
+            user.setEmail(userInfoDto.getEmail());
         }
 
         // Update Avatar
-        if (userProfileDto.getAvatar() != null && !userProfileDto.getAvatar().isEmpty()) {
+        if (userInfoDto.getAvatar() != null && !userInfoDto.getAvatar().isEmpty()) {
             // Delete old avatar if exists
             if (user.getAvatar() != null) {
                 fileStorageService.deleteFile(user.getAvatar());
             }
-            String fileName = fileStorageService.saveFile(userProfileDto.getAvatar());
+            String fileName = fileStorageService.saveFile(userInfoDto.getAvatar());
             user.setAvatar(fileName);
         }
 
+        userRepository.save(user);
+    }
+
+    @Override
+    public void changeUserPassword(String username, com.school.homework.dto.UserPasswordDto userPasswordDto) {
+        User user = findUserByUsername(username);
+
+        if (!userPasswordDto.getNewPassword().equals(userPasswordDto.getConfirmNewPassword())) {
+            throw new IllegalArgumentException("Passwords do not match");
+        }
+
+        user.setPassword(passwordEncoder.encode(userPasswordDto.getNewPassword()));
         userRepository.save(user);
     }
 
