@@ -27,49 +27,101 @@ public class ProfileController {
     @GetMapping("/profile")
     public String viewProfile(Model model, Principal principal) {
         User user = userService.findUserByUsername(principal.getName());
-        UserProfileDto userProfileDto = new UserProfileDto();
-        userProfileDto.setUsername(user.getUsername());
-        userProfileDto.setEmail(user.getEmail());
-        userProfileDto.setCurrentAvatar(user.getAvatar());
 
-        model.addAttribute("profile", userProfileDto);
+        // Prepare Info DTO
+        com.school.homework.dto.UserInfoDto userInfoDto = new com.school.homework.dto.UserInfoDto();
+        userInfoDto.setUsername(user.getUsername());
+        userInfoDto.setEmail(user.getEmail());
+        userInfoDto.setCurrentAvatar(user.getAvatar());
+        model.addAttribute("profile", userInfoDto);
+
+        // Prepare Password DTO
+        model.addAttribute("passwordChange", new com.school.homework.dto.UserPasswordDto());
+
         return "profile";
     }
 
-    @PostMapping("/profile")
-    public String updateProfile(@Valid @ModelAttribute("profile") UserProfileDto userProfileDto, BindingResult bindingResult, Principal principal, Model model) {
+    @PostMapping("/profile/info")
+    public String updateProfileInfo(@Valid @ModelAttribute("profile") com.school.homework.dto.UserInfoDto userInfoDto,
+            BindingResult bindingResult,
+            Principal principal,
+            Model model) {
         if (bindingResult.hasErrors()) {
-            // Need to reload current avatar as file input is cleared
             User user = userService.findUserByUsername(principal.getName());
-            userProfileDto.setCurrentAvatar(user.getAvatar());
+            userInfoDto.setCurrentAvatar(user.getAvatar()); // Reload avatar for display
+            userInfoDto.setUsername(user.getUsername()); // Ensure username is set
+            model.addAttribute("passwordChange", new com.school.homework.dto.UserPasswordDto());
             return "profile";
         }
 
         try {
-            userService.updateUserProfile(principal.getName(), userProfileDto);
-            model.addAttribute("successMessage", "Profile updated successfully!");
-        } catch (IllegalArgumentException | com.school.homework.exception.DuplicateResourceException e) {
+            userService.updateUserInfo(principal.getName(), userInfoDto);
+            model.addAttribute("successMessage", "Profile information updated successfully!");
+        } catch (com.school.homework.exception.DuplicateResourceException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            // Need to reload current avatar
             User user = userService.findUserByUsername(principal.getName());
-            userProfileDto.setCurrentAvatar(user.getAvatar());
+            userInfoDto.setCurrentAvatar(user.getAvatar());
+            userInfoDto.setUsername(user.getUsername());
+            model.addAttribute("passwordChange", new com.school.homework.dto.UserPasswordDto());
             return "profile";
         } catch (Exception e) {
             model.addAttribute("errorMessage", "An unexpected error occurred: " + e.getMessage());
-            // Need to reload current avatar
             User user = userService.findUserByUsername(principal.getName());
-            userProfileDto.setCurrentAvatar(user.getAvatar());
+            userInfoDto.setCurrentAvatar(user.getAvatar());
+            userInfoDto.setUsername(user.getUsername());
+            model.addAttribute("passwordChange", new com.school.homework.dto.UserPasswordDto());
             return "profile";
         }
 
-        userProfileDto.setNewPassword("");
-        userProfileDto.setConfirmNewPassword("");
+        // Reload fresh data
+        return ViewProfileWithSuccess(model, principal, "Profile updated successfully!");
+    }
 
-        // Reload avatar after success
-        User updatedUser = userService.findUserByUsername(principal.getName());
-        userProfileDto.setCurrentAvatar(updatedUser.getAvatar());
+    @PostMapping("/profile/password")
+    public String changePassword(
+            @Valid @ModelAttribute("passwordChange") com.school.homework.dto.UserPasswordDto userPasswordDto,
+            BindingResult bindingResult,
+            Principal principal,
+            Model model) {
+        if (bindingResult.hasErrors()) {
+            User user = userService.findUserByUsername(principal.getName());
+            com.school.homework.dto.UserInfoDto userInfoDto = new com.school.homework.dto.UserInfoDto();
+            userInfoDto.setUsername(user.getUsername());
+            userInfoDto.setEmail(user.getEmail());
+            userInfoDto.setCurrentAvatar(user.getAvatar());
+            model.addAttribute("profile", userInfoDto);
+            return "profile";
+        }
 
+        try {
+            userService.changeUserPassword(principal.getName(), userPasswordDto);
+            model.addAttribute("successMessage", "Password changed successfully!");
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            // Reload profile data
+            User user = userService.findUserByUsername(principal.getName());
+            com.school.homework.dto.UserInfoDto userInfoDto = new com.school.homework.dto.UserInfoDto();
+            userInfoDto.setUsername(user.getUsername());
+            userInfoDto.setEmail(user.getEmail());
+            userInfoDto.setCurrentAvatar(user.getAvatar());
+            model.addAttribute("profile", userInfoDto);
+            return "profile";
+        }
+
+        return ViewProfileWithSuccess(model, principal, "Password changed successfully!");
+    }
+
+    private String ViewProfileWithSuccess(Model model, Principal principal, String message) {
+        User user = userService.findUserByUsername(principal.getName());
+
+        com.school.homework.dto.UserInfoDto userInfoDto = new com.school.homework.dto.UserInfoDto();
+        userInfoDto.setUsername(user.getUsername());
+        userInfoDto.setEmail(user.getEmail());
+        userInfoDto.setCurrentAvatar(user.getAvatar());
+        model.addAttribute("profile", userInfoDto);
+
+        model.addAttribute("passwordChange", new com.school.homework.dto.UserPasswordDto());
+        model.addAttribute("successMessage", message);
         return "profile";
     }
 }
-
