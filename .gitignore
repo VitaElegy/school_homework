@@ -65,3 +65,8 @@ local.properties
 
 ### Spring Boot ###
 HELP.md
+
+### Database Files ###
+data/*.db
+data/*.lock.db
+data/*.trace.db
