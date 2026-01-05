@@ -1,5 +1,191 @@
 # 系统设计与实现文档
 
+## 0. 项目概述
+
+### 0.1 项目简介
+
+本项目是一个基于 Spring Boot 3.2.0 开发的博客系统，采用分层架构设计，实现了用户管理、文章发布、评论互动等核心功能。系统使用 H2 数据库进行数据持久化，支持 Markdown 格式的文章编辑和渲染，并提供了基于 RBAC（角色-权限）模型的权限管理系统。
+
+### 0.2 项目结构说明
+
+```
+school_homework/
+├── data/                          # 数据库文件目录（已忽略，不提交到Git）
+│   ├── blogdb.mv.db              # H2数据库主文件
+│   ├── blogdb.lock.db            # 数据库锁文件
+│   └── blogdb.trace.db           # 数据库跟踪日志
+│
+├── doc/                           # 项目文档目录
+│   └── system_documentation.md   # 系统设计与实现文档（本文档）
+│
+├── src/                           # 源代码目录
+│   ├── main/                     # 主代码目录
+│   │   ├── java/                # Java源代码
+│   │   │   └── com/school/homework/
+│   │   │       ├── config/      # 配置类目录
+│   │   │       │   ├── DataInitializer.java      # 数据初始化配置（启动时创建默认数据）
+│   │   │       │   ├── JpaConfig.java            # JPA配置（审计功能）
+│   │   │       │   ├── OpenApiConfig.java        # OpenAPI/Swagger配置
+│   │   │       │   ├── SecurityConfig.java       # Spring Security安全配置
+│   │   │       │   └── WebConfig.java            # Web MVC配置
+│   │   │       │
+│   │   │       ├── constant/    # 常量定义目录
+│   │   │       │   └── AppConstants.java         # 应用常量（角色名、权限名等）
+│   │   │       │
+│   │   │       ├── controller/  # 控制器目录（表示层）
+│   │   │       │   ├── BlogController.java      # 博客文章和评论控制器
+│   │   │       │   ├── HomeController.java      # 首页控制器（重定向）
+│   │   │       │   ├── LoginController.java     # 登录和注册控制器
+│   │   │       │   └── ProfileController.java   # 用户资料管理控制器
+│   │   │       │
+│   │   │       ├── dao/          # 数据访问层（Repository接口）
+│   │   │       │   ├── CommentRepository.java   # 评论数据访问接口
+│   │   │       │   ├── PermissionRepository.java # 权限数据访问接口
+│   │   │       │   ├── PostRepository.java      # 文章数据访问接口
+│   │   │       │   ├── RoleRepository.java      # 角色数据访问接口
+│   │   │       │   ├── TagRepository.java       # 标签数据访问接口
+│   │   │       │   ├── UserRepository.java      # 用户数据访问接口
+│   │   │       │   └── specification/           # 动态查询规范目录
+│   │   │       │       └── PostSpecification.java # 文章动态查询规范
+│   │   │       │
+│   │   │       ├── dto/          # 数据传输对象目录
+│   │   │       │   ├── CommentDto.java          # 评论DTO
+│   │   │       │   ├── PostDto.java              # 文章DTO
+│   │   │       │   ├── PostSearchCriteria.java   # 文章搜索条件DTO
+│   │   │       │   ├── RegisterDto.java         # 注册DTO
+│   │   │       │   ├── TagDto.java               # 标签DTO
+│   │   │       │   ├── UserDto.java              # 用户DTO
+│   │   │       │   ├── UserInfoDto.java          # 用户信息DTO
+│   │   │       │   ├── UserPasswordDto.java     # 用户密码DTO
+│   │   │       │   └── UserProfileDto.java      # 用户资料DTO
+│   │   │       │
+│   │   │       ├── entity/       # 实体类目录（领域模型）
+│   │   │       │   ├── BaseEntity.java          # 基础实体类（审计字段）
+│   │   │       │   ├── Comment.java             # 评论实体
+│   │   │       │   ├── Permission.java          # 权限实体
+│   │   │       │   ├── Post.java                 # 文章实体
+│   │   │       │   ├── Role.java                 # 角色实体
+│   │   │       │   ├── Tag.java                  # 标签实体
+│   │   │       │   └── User.java                 # 用户实体
+│   │   │       │
+│   │   │       ├── enums/        # 枚举类目录
+│   │   │       │   └── PostStatus.java          # 文章状态枚举（DRAFT/PUBLISHED/ARCHIVED）
+│   │   │       │
+│   │   │       ├── exception/    # 异常类目录
+│   │   │       │   ├── DuplicateResourceException.java    # 资源重复异常
+│   │   │       │   ├── GlobalExceptionHandler.java       # 全局异常处理器
+│   │   │       │   └── ResourceNotFoundException.java     # 资源未找到异常
+│   │   │       │
+│   │   │       ├── security/    # 安全相关目录
+│   │   │       │   └── CustomUserDetailsService.java      # 自定义用户详情服务
+│   │   │       │
+│   │   │       ├── service/     # 服务层接口和实现
+│   │   │       │   ├── CommentService.java      # 评论服务接口
+│   │   │       │   ├── FileStorageService.java  # 文件存储服务接口
+│   │   │       │   ├── MarkdownService.java     # Markdown渲染服务接口
+│   │   │       │   ├── PostImportService.java   # 文章导入服务接口
+│   │   │       │   ├── PostService.java         # 文章服务接口
+│   │   │       │   ├── UserService.java         # 用户服务接口
+│   │   │       │   └── impl/                    # 服务实现类目录
+│   │   │       │       ├── CommentServiceImpl.java      # 评论服务实现
+│   │   │       │       ├── FileStorageServiceImpl.java  # 文件存储服务实现
+│   │   │       │       ├── MarkdownServiceImpl.java     # Markdown渲染服务实现
+│   │   │       │       ├── PostImportServiceImpl.java  # 文章导入服务实现
+│   │   │       │       ├── PostServiceImpl.java         # 文章服务实现
+│   │   │       │       └── UserServiceImpl.java         # 用户服务实现
+│   │   │       │
+│   │   │       └── SchoolHomeworkApplication.java # Spring Boot主启动类
+│   │   │
+│   │   └── resources/           # 资源文件目录
+│   │       ├── application.properties    # 应用配置文件
+│   │       ├── posts/                    # Markdown文章资源目录（自动导入）
+│   │       │   ├── auto-import-guide.md  # 自动导入指南示例
+│   │       │   └── markdown-demo.md      # Markdown演示示例
+│   │       ├── static/                   # 静态资源目录
+│   │       │   └── css/
+│   │       │       └── style.css         # 自定义样式表
+│   │       └── templates/                # Thymeleaf模板目录
+│   │           ├── blog/                 # 博客相关模板
+│   │           │   ├── create_post.html  # 创建文章页面
+│   │           │   ├── edit_post.html    # 编辑文章页面
+│   │           │   ├── post_detail.html  # 文章详情页面
+│   │           │   └── posts.html        # 文章列表页面
+│   │           ├── error/                # 错误页面模板
+│   │           │   ├── 403.html         # 403禁止访问页面
+│   │           │   ├── 404.html         # 404未找到页面
+│   │           │   ├── 409.html         # 409冲突页面
+│   │           │   └── error.html       # 通用错误页面
+│   │           ├── fragments/            # 页面片段模板
+│   │           │   ├── head.html        # 页面头部片段
+│   │           │   └── header.html      # 导航栏片段
+│   │           ├── login.html            # 登录页面
+│   │           ├── profile.html          # 用户资料页面
+│   │           └── register.html         # 注册页面
+│   │
+│   └── test/                      # 测试代码目录
+│       └── java/                  # Java测试代码
+│           └── com/school/homework/
+│               ├── controller/   # 控制器测试
+│               │   ├── BlogControllerIntegrationTest.java
+│               │   └── LoginControllerTest.java
+│               └── service/       # 服务层测试
+│                   ├── CommentServiceTest.java
+│                   ├── PostServiceTest.java
+│                   └── UserServiceTest.java
+│
+├── target/                         # Maven编译输出目录（已忽略）
+│
+├── uploads/                        # 用户上传文件目录（已忽略）
+│   └── avatars/                    # 用户头像存储目录
+│
+├── .gitignore                      # Git忽略文件配置
+├── pom.xml                         # Maven项目配置文件
+└── README.md                       # 项目说明文档
+```
+
+### 0.3 目录结构说明
+
+#### 核心代码目录
+
+- **config/**: 存放 Spring Boot 配置类，包括安全配置、JPA配置、Web配置等
+- **controller/**: 控制器层，处理 HTTP 请求，负责请求路由和参数验证
+- **service/**: 服务层，包含接口定义和实现类，封装业务逻辑
+- **dao/**: 数据访问层，Spring Data JPA Repository 接口，定义数据库操作方法
+- **entity/**: 实体类，JPA 实体，映射数据库表结构
+- **dto/**: 数据传输对象，用于控制器和服务层之间的数据传输
+- **exception/**: 自定义异常类和全局异常处理器
+- **security/**: Spring Security 相关配置和自定义用户详情服务
+- **constant/**: 应用常量定义（角色名、权限名等）
+- **enums/**: 枚举类定义
+
+#### 资源文件目录
+
+- **resources/application.properties**: 应用配置文件，包含数据库连接、默认用户等配置
+- **resources/posts/**: Markdown 文件目录，应用启动时自动导入这些文件作为初始文章
+- **resources/static/**: 静态资源目录，存放 CSS、JS、图片等静态文件
+- **resources/templates/**: Thymeleaf 模板目录，存放 HTML 模板文件
+
+#### 其他目录
+
+- **data/**: H2 数据库文件存储目录（运行时生成，不提交到 Git）
+- **uploads/**: 用户上传文件存储目录（不提交到 Git）
+- **target/**: Maven 编译输出目录（不提交到 Git）
+- **doc/**: 项目文档目录
+
+### 0.4 技术栈
+
+- **后端框架**: Spring Boot 3.2.0
+- **编程语言**: Java 17
+- **构建工具**: Maven
+- **数据库**: H2 Database（文件模式）
+- **ORM**: Spring Data JPA + Hibernate
+- **安全框架**: Spring Security 6（RBAC模型）
+- **模板引擎**: Thymeleaf
+- **Markdown引擎**: commonmark-java 0.21.0
+- **前端框架**: Bootstrap 4
+
+---
+
 ## 1. 系统架构概览
 
 本项目采用标准的**分层架构**模式，这是 Spring Boot 应用程序中常见的架构模式。这种关注点分离确保了可维护性、可扩展性和可测试性。

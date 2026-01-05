@@ -23,14 +23,44 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 文章服务实现类
+ * 
+ * <p>实现文章相关的业务逻辑，包括文章的 CRUD 操作、搜索、标签处理等。</p>
+ * 
+ * <p>主要功能：
+ * <ul>
+ *   <li>文章创建、更新、删除</li>
+ *   <li>文章搜索和分页</li>
+ *   <li>标签处理（批量查询优化，避免 N+1 问题）</li>
+ *   <li>浏览次数原子递增</li>
+ *   <li>权限检查（所有权验证）</li>
+ * </ul>
+ * </p>
+ * 
+ * @author School Homework Team
+ * @version 1.0
+ */
 @Service
 @Transactional
 public class PostServiceImpl implements PostService {
 
+    /** 文章数据访问接口 */
     private final PostRepository postRepository;
+    
+    /** 用户数据访问接口 */
     private final UserRepository userRepository;
+    
+    /** 标签数据访问接口 */
     private final TagRepository tagRepository;
 
+    /**
+     * 构造函数注入依赖
+     * 
+     * @param postRepository 文章数据访问接口
+     * @param userRepository 用户数据访问接口
+     * @param tagRepository 标签数据访问接口
+     */
     @Autowired
     public PostServiceImpl(PostRepository postRepository, UserRepository userRepository, TagRepository tagRepository) {
         this.postRepository = postRepository;
